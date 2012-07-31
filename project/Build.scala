@@ -3,15 +3,18 @@ import sbt.Keys._
 
 object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
-    name := "Spire",
-    version := "0.2.0",
-    scalaVersion := "2.10.0-M5",
-    //scalaHome := Some(file("/home/erik/scala/build/pack")),
+    name := "spire",
+    organization := "org.spire-math",
+    version := "0.3.0-M1",
+    scalaVersion := "2.10.0-M6",
+
+    licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
+    homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
       //"org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
-      "org.scalatest" % "scalatest_2.10.0-M5" % "1.9-2.10.0-M5-B1" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-M5"
+      "org.scalatest" % "scalatest_2.10.0-M6" % "1.9-2.10.0-M6-B1" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-M6"
     ),
     
     scalacOptions ++= Seq(
@@ -22,6 +25,40 @@ object MyBuild extends Build {
       // also, may need to turn off specialization to compile macros
       //"-no-specialization",
       "-feature"
+    ),
+
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ => false },
+
+    publishTo <<= version {
+      (v: String) =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT")) 
+        Some("snapshots" at nexus + "content/repositories/snapshots") 
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    },
+
+    pomExtra := (
+
+<scm>
+  <url>git@github.com:non/spire.git</url>
+  <connection>scm:git:git@github.com:non/spire.git</connection>
+</scm>
+<developers>
+  <developer>
+    <id>d_m</id>
+    <name>Erik Osheim</name>
+    <url>http://github.com/non/</url>
+  </developer>
+  <developer>
+    <id>tixxit</id>
+    <name>Tom Switzer</name>
+    <url>http://github.com/tixxit/</url>
+  </developer>
+</developers>
+
     )
   )
 
