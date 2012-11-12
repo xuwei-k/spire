@@ -104,11 +104,23 @@ sealed trait Natural {
     recur(lhs, rhs, 0)
   }
 
+  def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
+  def <=(rhs: Natural): Boolean = (lhs compare rhs) <= 0
+  def >(rhs: Natural): Boolean = (lhs compare rhs) > 0
+  def >=(rhs: Natural): Boolean = (lhs compare rhs) >= 0
+
+  def <(r: UInt): Boolean = (lhs compare r) < 0
+  def <=(r: UInt): Boolean = (lhs compare r) <= 0
+  def >(r: UInt): Boolean = (lhs compare r) > 0
+  def >=(r: UInt): Boolean = (lhs compare r) >= 0
+
   // implemented in Digit and End
   def +(rd: UInt): Natural
   def -(rd: UInt): Natural
   def *(rd: UInt): Natural
   def /(rd: UInt): Natural
+  def %(rd: UInt): Natural
+  def /%(rd: UInt): (Natural, Natural)
 
   def +(rhs: Natural): Natural = {
     def recur(left: Natural, right: Natural, carry: Long): Natural = left match {
@@ -192,6 +204,76 @@ sealed trait Natural {
       case 1 => sys.error("unimplemented")
     }
   }
+
+  def <<(n: Int): Natural = {
+    val m: Int = n & 0x1f
+    def recur(next: Natural, carry: Long): Natural = next match {
+      case End(d) =>
+        Natural((d.toLong << m) | carry)
+      case Digit(d, tail) =>
+        val t = (d.toLong << m) | carry
+        Digit(UInt(t), recur(tail, t >> 32))
+    }
+    val num = recur(this, 0L)
+    (0 until n / 32).foldLeft(num)((n, _) => Digit(UInt(0), n))
+  }
+
+  def chop(n: Int): Natural = {
+    @tailrec def recur(next: Natural, n: Int): Natural = if (n <= 0) {
+      next
+    } else {
+      next match {
+        case End(d) => End(UInt(0))
+        case Digit(d, tail) => recur(tail, n - 1)
+      }
+    }
+    recur(this, n)
+  }
+
+  def >>(n: Int): Natural = {
+    val m: Int = n & 0x1f
+    def recur(next: Natural, carry: Long): Natural = next match {
+      case End(d) =>
+        Natural((d.toLong >> m) | carry)
+      case Digit(d, tail) =>
+        val t = (d.toLong | carry) << (32 - m)
+        Digit(UInt(t >> 32), recur(tail, t & 0xffffffffL))
+    }
+    recur(chop(n / 32).reversed, 0L).reversed
+  }
+
+  def |(rhs: Natural): Natural = lhs match {
+    case End(ld) => rhs match {
+      case End(rd) => End(ld | rd)
+      case Digit(rd, rtail) => Digit(ld | rd, rtail)
+    }
+    case Digit(ld, ltail) => rhs match {
+      case End(rd) => Digit(ld | rd, ltail)
+      case Digit(rd, rtail) => Digit(ld | rd, ltail | rtail)
+    }
+  }
+
+  def &(rhs: Natural): Natural = lhs match {
+    case End(ld) => rhs match {
+      case End(rd) => End(ld & rd)
+      case Digit(rd, rtail) => End(ld & rd)
+    }
+    case Digit(ld, ltail) => rhs match {
+      case End(rd) => End(ld & rd)
+      case Digit(rd, rtail) => Digit(ld & rd, ltail & rtail)
+    }
+  }
+
+  def ^(rhs: Natural): Natural = lhs match {
+    case End(ld) => rhs match {
+      case End(rd) => End(ld ^ rd)
+      case Digit(rd, rtail) => Digit(ld ^ rd, rtail)
+    }
+    case Digit(ld, ltail) => rhs match {
+      case End(rd) => Digit(ld ^ rd, ltail)
+      case Digit(rd, rtail) => Digit(ld ^ rd, ltail ^ rtail)
+    }
+  }
 }
 
 object Natural {
@@ -240,14 +322,18 @@ object Natural {
     else
       Natural(d.toLong * n.toLong) + Digit(UInt(0), tl * n)
 
-    def /(n: UInt): Natural = {
+    def /(n: UInt): Natural = (this /% n)._1
+
+    def %(n: UInt): Natural = (this /% n)._2
+
+    def /%(n: UInt): (Natural, Natural) = {
       @tailrec
-      def recur(next: Natural, rem: UInt, sofar: Natural): Natural = {
+      def recur(next: Natural, rem: UInt, sofar: Natural): (Natural, Natural) = {
         val t: Long = (rem.toLong << 32) + next.digit.toLong
         val q: Long = t / n.toLong
         val r: Long = t % n.toLong
         next match {
-          case End(d) => Digit(q, sofar).reversed
+          case End(d) => (Digit(q, sofar), End(r))
           case Digit(d, tail) => recur(tail, r, Digit(q, sofar))
         }
       }
@@ -255,13 +341,13 @@ object Natural {
       if (n == UInt(0)) {
         sys.error("/ by zero")
       } else if (n == UInt(1)) {
-        this
+        (this, Natural(UInt(0)))
       } else {
         reversed match {
           case Digit(d, tail) =>
             val q = d / n
             val r = d % n
-            recur(tail, r, End(q)).reversed
+            recur(tail, r, End(q))
           case _ =>
             sys.error("bug in reversed")
         }
@@ -303,5 +389,12 @@ object Natural {
       sys.error("/ by zero")
     else
       End(d / n)
+
+    def %(n: UInt): Natural = if (n == UInt(0))
+      sys.error("/ by zero")
+    else
+      End(d % n)
+
+    def /%(n: UInt): (Natural, Natural) = (this / n, this % n)
   }
 }
