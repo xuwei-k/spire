@@ -56,14 +56,28 @@ sealed trait Natural {
     case Digit(d, tail) => (tail.toInt << 32L) + d.toLong
   }
 
-  // TODO: can probably do better than this
+  // TODO: consider using BigInt(toString) instead
   def toBigInt: BigInt = this match {
     case End(d) => BigInt(d.toLong)
     case Digit(d, tail) => (tail.toBigInt << 32) + BigInt(d.toLong)
   }
 
-  // TODO: must do a better job than this
-  override def toString: String = toBigInt.toString
+  // calculate 9 digits at a time using /%
+  override def toString: String = {
+    @tailrec def recur(next: Natural, s: String): String = {
+      next match {
+        case End(d) =>
+          d.toInt.toString + s
+        case Digit(d, tail) =>
+          val (q, r) = next /% Natural.denom
+          if (q == UInt(0))
+            r.digit.toInt.toString + s
+          else
+            recur(q, "%09d%s" format (r.digit.toInt, s))
+      }
+    }
+    recur(this, "")
+  }
 
   def toRepr: String = toList.mkString("Natural(", ", ", ")")
 
@@ -76,6 +90,33 @@ sealed trait Natural {
         if (n == UInt(0)) recur(tail) else false
     }
     recur(this)
+  }
+
+  def powerOfTwo: Int = {
+    import java.lang.Integer.highestOneBit
+
+    def test(n: UInt): Int = {
+      if ((n.signed & -n.signed) != n.signed) return -1
+      var i = 0
+      while (i < 32 && (n >>> i) != 0) i += 1
+      i - 1
+    }
+
+    @tailrec
+    def recur(next: Natural, shift: Int, bit: Int): Int = next match {
+      case End(n) =>
+        val t = test(n)
+        if (t < 0) bit else if (bit < 0) shift + t else -1
+      case Digit(n, tail) =>
+        val t = test(n)
+        if (t < 0)
+          recur(tail, shift + 32, bit)
+        else if (bit < 0)
+          recur(tail, shift + 32, shift + t)
+        else
+          -1
+    }
+    recur(this, 0, -1)
   }
 
   def compare(rhs: UInt): Int = this match {
@@ -102,6 +143,12 @@ sealed trait Natural {
     }
 
     recur(lhs, rhs, 0)
+  }
+
+  final override def equals(rhs: Any): Boolean = rhs match {
+    case rhs: Natural => (lhs compare rhs) == 0
+    case rhs: UInt => (lhs compare rhs) == 0
+    case _ => false
   }
 
   def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
@@ -195,13 +242,20 @@ sealed trait Natural {
   }
 
   // TODO: ugh, sorry...
-  def /(rhs: Natural): Natural = rhs match {
-    case End(rd) => lhs / rd
-
-    case Digit(rd, rtail) => rhs.compare(UInt(1)) match {
-      case -1 => sys.error("/ by zero")
-      case 0 => lhs
-      case 1 => sys.error("unimplemented")
+  def /(rhs: Natural): Natural = {
+    rhs match {
+      case End(rd) => lhs / rd
+  
+      case Digit(rd, rtail) => rhs.compare(UInt(1)) match {
+        case -1 => sys.error("/ by zero")
+        case 0 => lhs
+        case 1 =>
+          val p = rhs.powerOfTwo
+          if (p >= 0)
+            lhs >> p
+          else
+            sys.error("todo: multi-digit denominators")
+      }
     }
   }
 
@@ -253,34 +307,42 @@ sealed trait Natural {
     }
   }
 
-  def &(rhs: Natural): Natural = lhs match {
-    case End(ld) => rhs match {
-      case End(rd) => End(ld & rd)
-      case Digit(rd, rtail) => End(ld & rd)
+  def &(rhs: Natural): Natural = {
+    def and(lhs: Natural, rhs: Natural): Natural = lhs match {
+      case End(ld) => rhs match {
+        case End(rd) => End(ld & rd)
+        case Digit(rd, rtail) => End(ld & rd)
+      }
+      case Digit(ld, ltail) => rhs match {
+        case End(rd) => End(ld & rd)
+        case Digit(rd, rtail) => Digit(ld & rd, and(ltail, rtail))
+      }
     }
-    case Digit(ld, ltail) => rhs match {
-      case End(rd) => End(ld & rd)
-      case Digit(rd, rtail) => Digit(ld & rd, ltail & rtail)
-    }
+    and(lhs, rhs).trim
   }
 
-  def ^(rhs: Natural): Natural = lhs match {
-    case End(ld) => rhs match {
-      case End(rd) => End(ld ^ rd)
-      case Digit(rd, rtail) => Digit(ld ^ rd, rtail)
+  def ^(rhs: Natural): Natural = {
+    def xor(lhs: Natural, rhs: Natural): Natural = lhs match {
+      case End(ld) => rhs match {
+        case End(rd) => End(ld ^ rd)
+        case Digit(rd, rtail) => Digit(ld ^ rd, rtail)
+      }
+      case Digit(ld, ltail) => rhs match {
+        case End(rd) => Digit(ld ^ rd, ltail)
+        case Digit(rd, rtail) => Digit(ld ^ rd, ltail ^ rtail)
+      }
     }
-    case Digit(ld, ltail) => rhs match {
-      case End(rd) => Digit(ld ^ rd, ltail)
-      case Digit(rd, rtail) => Digit(ld ^ rd, ltail ^ rtail)
-    }
+    xor(lhs, rhs).trim
   }
 }
 
 object Natural {
+  private[math] final val denom = UInt(1000000000)
+
   // required in big-endian order
   def apply(us: UInt*): Natural = {
     if (us.isEmpty) sys.error("invalid arguments")
-    us.tail.foldLeft(End(us.head):Natural)((n, u) => Digit(u, n))
+    us.tail.foldLeft(End(us.head): Natural)((n, u) => Digit(u, n))
   }
 
   def apply(n: Long): Natural = if (n < 0L)
