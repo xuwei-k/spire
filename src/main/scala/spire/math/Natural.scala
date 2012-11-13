@@ -97,7 +97,8 @@ sealed trait Natural {
 
     def test(n: UInt): Int = {
       if ((n.signed & -n.signed) != n.signed) return -1
-      var i = 0
+      // TODO: this could be better/faster
+      var i = 1
       while (i < 32 && (n >>> i) != 0) i += 1
       i - 1
     }
@@ -359,7 +360,7 @@ object Natural {
   else
     Digit(UInt((n & 0xffffffffL).toLong), apply(n >> 32))
 
-  case class Digit(private var d: UInt, private[math] var tl: Natural) extends Natural {
+  case class Digit(d: UInt, tl: Natural) extends Natural {
     def digit: UInt = d
     def tail: Natural = tl
 
@@ -417,7 +418,7 @@ object Natural {
     }
   }
 
-  case class End(private var d: UInt) extends Natural {
+  case class End(d: UInt) extends Natural {
     def digit: UInt = d
 
     def +(n: UInt): Natural = if (n == UInt(0)) {
