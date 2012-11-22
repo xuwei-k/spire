@@ -349,9 +349,9 @@ object Natural {
   def apply(n: Long): Natural = if (n < 0L)
     sys.error("negative numbers not allowed: %s" format n)
   else if (n <= 0xffffffffL)
-    End(UInt(n))
+    End(UInt(n.toInt))
   else
-    Digit(UInt(n), End(UInt(n >> 32)))
+    Digit(UInt(n.toInt), End(UInt((n >> 32).toInt)))
 
   def apply(n: BigInt): Natural = if (n < 0)
     sys.error("negative numbers not allowd: %s" format n)
