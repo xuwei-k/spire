@@ -124,7 +124,9 @@ sealed trait Natural {
     case End(d) =>
       if (d < rhs) -1 else if (d > rhs) 1 else 0
     case Digit(d, tail) =>
-      if (d > rhs || !tail.isZero) 1 else if (d < rhs) -1 else 0
+      // TODO: we must be sure there can't be leading zeros
+      //if (d > rhs || !tail.isZero) 1 else if (d < rhs) -1 else 0
+      if (d > rhs) 1 else if (d < rhs) -1 else 0
   }
 
   def compare(rhs: Natural): Int = {
@@ -235,11 +237,32 @@ sealed trait Natural {
     case Digit(ld, ltail) => rhs match {
       case End(rd) => lhs * rd
       case Digit(rd, rtail) =>
-          Natural(ld.toLong * rd.toLong) +
-            lhs * rd +
-            rhs * ld +
-            Digit(UInt(0), Digit(UInt(0), ltail * rtail))
+        // TODO: karatsuba might do better, but didn't when i last tried
+        // in our case, the fact that Natural*UInt is so much faster might
+        // distort the results a bit.
+        Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
+        Digit(UInt(0), ltail * rd) +
+        Digit(UInt(0), rtail * ld) +
+        Natural(ld.toLong * rd.toLong)
     }
+  }
+
+  def pow(rhs: Natural): Natural = {
+    @tailrec def _pow(t: Natural, b: Natural, e: Natural): Natural = {
+      if (e == UInt(0)) t
+      else if ((e & UInt(1)) == UInt(1)) _pow(t * b, b * b, e >> 1)
+      else _pow(t, b * b, e >> 1)
+    }
+    _pow(Natural(1), lhs, rhs)
+  }
+
+  def pow(rhs: UInt): Natural = {
+    @tailrec def _pow(t: Natural, b: Natural, e: UInt): Natural = {
+      if (e == UInt(0)) t
+      else if ((e & UInt(1)) == UInt(1)) _pow(t * b, b * b, e >> 1)
+      else _pow(t, b * b, e >> 1)
+    }
+    _pow(Natural(1), lhs, rhs)
   }
 
   // TODO: ugh, sorry...
@@ -252,10 +275,11 @@ sealed trait Natural {
         case 0 => lhs
         case 1 =>
           val p = rhs.powerOfTwo
-          if (p >= 0)
+          if (p >= 0) {
             lhs >> p
-          else
+          } else {
             sys.error("todo: multi-digit denominators")
+          }
       }
     }
   }
@@ -308,6 +332,11 @@ sealed trait Natural {
     }
   }
 
+  def |(rhs: UInt): Natural = lhs match {
+    case End(ld) => End(ld | rhs)
+    case Digit(ld, ltail) => Digit(ld | rhs, ltail)
+  }
+
   def &(rhs: Natural): Natural = {
     def and(lhs: Natural, rhs: Natural): Natural = lhs match {
       case End(ld) => rhs match {
@@ -322,6 +351,8 @@ sealed trait Natural {
     and(lhs, rhs).trim
   }
 
+  def &(rhs: UInt): Natural = End(digit & rhs)
+
   def ^(rhs: Natural): Natural = {
     def xor(lhs: Natural, rhs: Natural): Natural = lhs match {
       case End(ld) => rhs match {
@@ -335,8 +366,15 @@ sealed trait Natural {
     }
     xor(lhs, rhs).trim
   }
+
+  def ^(rhs: UInt): Natural = lhs match {
+    case End(ld) => End(ld ^ rhs)
+    case Digit(ld, ltail) => Digit(ld ^ rhs, ltail)
+  }
 }
 
+// TODO: maybe split apply into apply() and fromX()
+// this way we can protect end-users from sign problems
 object Natural {
   private[math] final val denom = UInt(1000000000)
 
@@ -346,9 +384,7 @@ object Natural {
     us.tail.foldLeft(End(us.head): Natural)((n, u) => Digit(u, n))
   }
 
-  def apply(n: Long): Natural = if (n < 0L)
-    sys.error("negative numbers not allowed: %s" format n)
-  else if (n <= 0xffffffffL)
+  def apply(n: Long): Natural = if ((n & 0xffffffffL) == n)
     End(UInt(n.toInt))
   else
     Digit(UInt(n.toInt), End(UInt((n >> 32).toInt)))
