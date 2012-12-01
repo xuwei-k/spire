@@ -270,18 +270,51 @@ sealed trait Natural {
     rhs match {
       case End(rd) => lhs / rd
   
-      case Digit(rd, rtail) => rhs.compare(UInt(1)) match {
-        case -1 => sys.error("/ by zero")
-        case 0 => lhs
-        case 1 =>
-          val p = rhs.powerOfTwo
-          if (p >= 0) {
-            lhs >> p
-          } else {
-            sys.error("todo: multi-digit denominators")
-          }
+      case Digit(rd, rtail) => lhs match {
+        case End(ld) => End(UInt(0))
+
+        case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
+          case -1 => sys.error("/ by zero")
+          case 0 => lhs
+          case 1 =>
+            val p = rhs.powerOfTwo
+            if (p >= 0) lhs >> p else longdiv(lhs, rhs)
+        }
       }
     }
+  }
+
+  private def longdiv(num: Natural, denom: Natural): Natural = {
+    sys.error("todo: multi-digit denominators")
+    val s: Int = sys.error("# zero bits from left")
+    //val vn: Natural = num << s
+    //val un: Natural = denom << s
+    val vn: Array[Int] = sys.error("fixme")
+    val un: Array[Int] = sys.error("fixme")
+
+    val b: Long = 0xffffffffL
+    val m: Int = sys.error("words in u")
+    val n: Int = sys.error("words in v")
+
+    // from most significant digit down, do...
+    for (j <- (m - n) to 0 by -1) {
+      val t: Long = un(j + n) * b + un(j + n - 1)
+      var qhat: Long = t / vn(n - 1)
+      var rhat: Long = t - qhat * vn(n - 1)
+
+      // TODO: this is a translation of a goto
+      def adjust() {
+        if (qhat >= b || qhat * vn(n - 2) > b * rhat + un(j + n - 2)) {
+          qhat -= 1
+          rhat += vn(n - 1)
+          if (rhat < b) adjust()
+        }
+      }
+      adjust()
+
+      // continue working
+    }
+    null //FIXME
   }
 
   def <<(n: Int): Natural = {
