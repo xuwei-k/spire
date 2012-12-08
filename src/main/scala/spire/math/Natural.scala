@@ -15,6 +15,27 @@ sealed trait Natural {
 
   def digit: UInt
 
+  def getNumBits: Int = {
+    @tailrec
+    def bit(n: UInt, b: Int): Int = if (n == 0) b else bit(n >>> 1, b + 1)
+
+    @tailrec
+    def recur(next: Natural, b: Int): Int = next match {
+      case End(d) => b + bit(d, 0)
+      case Digit(_, tail) => recur(tail, b + 32)
+    }
+    recur(this, 0)
+  }
+
+  def getDigitLength: Int = {
+    @tailrec
+    def recur(next: Natural, n: Int): Int = next match {
+      case End(d) => n + 1
+      case Digit(d, tail) => recur(tail, n + 1)
+    }
+    recur(this, 0)
+  }
+
   def toList: List[UInt] = {
     @tailrec
     def recur(next: Natural, sofar: List[UInt]): List[UInt] = next match {
@@ -22,6 +43,21 @@ sealed trait Natural {
       case Digit(d, tail) => recur(tail, d :: sofar)
     }
     recur(this, Nil)
+  }
+
+  def toArray: Array[Int] = {
+    val n = getDigitLength
+    val arr = new Array[Int](n)
+    @tailrec
+    def recur(next: Natural, i: Int): Unit = next match {
+      case End(d) =>
+        arr(i) = d.signed
+      case Digit(d, tail) =>
+        arr(i) = d.signed
+        recur(tail, i - 1)
+    }
+    recur(this, n - 1)
+    arr
   }
 
   def reversed: Natural = {
@@ -237,7 +273,7 @@ sealed trait Natural {
     case Digit(ld, ltail) => rhs match {
       case End(rd) => lhs * rd
       case Digit(rd, rtail) =>
-        // TODO: karatsuba might do better, but didn't when i last tried
+        // TODO: karatsuba might do better, but didn't when i last tried.
         // in our case, the fact that Natural*UInt is so much faster might
         // distort the results a bit.
         Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
@@ -265,7 +301,6 @@ sealed trait Natural {
     _pow(Natural(1), lhs, rhs)
   }
 
-  // TODO: ugh, sorry...
   def /(rhs: Natural): Natural = {
     rhs match {
       case End(rd) => lhs / rd
@@ -278,43 +313,77 @@ sealed trait Natural {
           case 0 => lhs
           case 1 =>
             val p = rhs.powerOfTwo
-            if (p >= 0) lhs >> p else longdiv(lhs, rhs)
+            if (p >= 0) lhs >> p else longdiv(lhs, rhs)._1
         }
       }
     }
   }
 
-  private def longdiv(num: Natural, denom: Natural): Natural = {
-    sys.error("todo: multi-digit denominators")
-    val s: Int = sys.error("# zero bits from left")
-    //val vn: Natural = num << s
-    //val un: Natural = denom << s
-    val vn: Array[Int] = sys.error("fixme")
-    val un: Array[Int] = sys.error("fixme")
+  def %(rhs: Natural): Natural = {
+    rhs match {
+      case End(rd) => lhs % rd
+  
+      case Digit(rd, rtail) => lhs match {
+        case End(ld) => End(ld)
 
-    val b: Long = 0xffffffffL
-    val m: Int = sys.error("words in u")
-    val n: Int = sys.error("words in v")
-
-    // from most significant digit down, do...
-    for (j <- (m - n) to 0 by -1) {
-      val t: Long = un(j + n) * b + un(j + n - 1)
-      var qhat: Long = t / vn(n - 1)
-      var rhat: Long = t - qhat * vn(n - 1)
-
-      // TODO: this is a translation of a goto
-      def adjust() {
-        if (qhat >= b || qhat * vn(n - 2) > b * rhat + un(j + n - 2)) {
-          qhat -= 1
-          rhat += vn(n - 1)
-          if (rhat < b) adjust()
+        case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
+          case -1 => sys.error("/ by zero")
+          case 0 => End(0)
+          case 1 =>
+            val p = rhs.powerOfTwo
+            if (p >= 0)
+              lhs & ((Natural(1) << p) - UInt(1))
+            else
+              longdiv(lhs, rhs)._2
         }
       }
-      adjust()
-
-      // continue working
     }
-    null //FIXME
+  }
+
+  def /%(rhs: Natural): (Natural, Natural) = {
+    rhs match {
+      case End(rd) => (lhs / rd, lhs % rd)
+  
+      case Digit(rd, rtail) => lhs match {
+        case End(ld) => (End(UInt(0)), lhs)
+
+        case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
+          case -1 => sys.error("/ by zero")
+          case 0 => (lhs, Natural(0))
+          case 1 =>
+            val p = rhs.powerOfTwo
+            if (p >= 0) {
+              val mask = (Natural(1) << p) - UInt(1)
+              (lhs >> p, lhs & mask)
+            } else {
+              longdiv(lhs, rhs)
+            }
+        }
+      }
+    }
+  }
+
+  private def longdiv(num: Natural, denom: Natural): (Natural, Natural) = {
+    var rem = num
+    var quo = Natural(0)
+
+    var remBits: Int = rem.getNumBits
+    var denomBits: Int = denom.getNumBits
+    var shift: Int = remBits - denomBits
+
+    while (shift >= 0) {
+      val shifted = denom << shift
+      if (shifted <= rem) {
+        quo = quo + Natural(1) << shift
+        rem = rem - shifted
+        remBits = rem.getNumBits
+        shift = remBits - denomBits
+      } else {
+        shift -= 1
+      }
+    }
+
+    (quo, rem)
   }
 
   def <<(n: Int): Natural = {
