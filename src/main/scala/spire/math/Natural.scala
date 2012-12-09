@@ -1,6 +1,7 @@
 package spire.math
 
 import scala.annotation.tailrec
+import scala.{specialized => spec}
 
 import Natural._
 
@@ -14,6 +15,17 @@ sealed trait Natural {
   lhs =>
 
   def digit: UInt
+
+  def foldDigitsLeft[@spec A](a: A)(f: (A, UInt) => A): A = {
+    @tailrec def recur(next: Natural, sofar: A): A = next match {
+      case End(d) => f(a, d)
+      case Digit(d, tail) => recur(tail, f(a, d))
+    }
+    recur(this, a)
+  }
+
+  def foldDigitsRight[@spec A](a: A)(f: (A, UInt) => A): A =
+    reversed.foldDigitsLeft(a)(f)
 
   def getNumBits: Int = {
     @tailrec
@@ -45,6 +57,7 @@ sealed trait Natural {
     recur(this, Nil)
   }
 
+  // Array[UInt] would be boxed so we do this for now.
   def toArray: Array[Int] = {
     val n = getDigitLength
     val arr = new Array[Int](n)
@@ -92,7 +105,6 @@ sealed trait Natural {
     case Digit(d, tail) => (tail.toInt << 32L) + d.toLong
   }
 
-  // TODO: consider using BigInt(toString) instead
   def toBigInt: BigInt = this match {
     case End(d) => BigInt(d.toLong)
     case Digit(d, tail) => (tail.toBigInt << 32) + BigInt(d.toLong)
