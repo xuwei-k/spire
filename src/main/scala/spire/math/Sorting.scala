@@ -27,7 +27,8 @@ object InsertionSort extends Sort {
     while (i < end) {
       val item = data(i)
       var hole = i
-      while (hole > start && o.gt(data(hole - 1), item)) {
+      //while (hole > start && o.gt(data(hole - 1), item)) {
+      while (hole > start && o.compare(data(hole - 1), item) > 0) {
         data(hole) = data(hole - 1)
         hole -= 1
       }
@@ -96,7 +97,8 @@ object MergeSort extends Sort {
     var jj = mid
     var kk = start
     while (kk < end) {
-      if (ii < mid && (jj >= end || o.lteqv(in(ii), in(jj)))) {
+      //if (ii < mid && (jj >= end || o.lteqv(in(ii), in(jj)))) {
+      if (ii < mid && (jj >= end || o.compare(in(ii), in(jj)) < 1)) {
         out(kk) = in(ii); ii += 1
       } else {
         out(kk) = in(jj); jj += 1
@@ -140,7 +142,8 @@ object QuickSort {
     var store = left
     var i = left
     while (i < right) {
-      if (o.lt(data(i), value)) {
+      //if (o.lt(data(i), value)) {
+      if (o.compare(data(i), value) < 0) {
         //swap(i, store)
         tmp = data(i); data(i) = data(store); data(store) = tmp
         store += 1
