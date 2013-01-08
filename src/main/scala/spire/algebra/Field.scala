@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 import java.lang.Math
 
 import scala.{specialized => spec}
@@ -14,10 +13,10 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with Multip
 }
 
 final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
-  def isWhole() = macro Ops.unop[Boolean]
-  def ceil() = macro Ops.unop[A]
-  def floor() = macro Ops.unop[A]
-  def round() = macro Ops.unop[A]
+  def isWhole() = ev.isWhole(lhs)
+  def ceil() = ev.ceil(lhs)
+  def floor() = ev.floor(lhs)
+  def round() = ev.round(lhs)
 }
 
 object Field {
@@ -40,7 +39,7 @@ trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
   def div(a:Float, b:Float) = a / b
   def ceil(a:Float): Float = Math.floor(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
-  def round(a:Float): Float = spire.math.round(a)
+  def round(a:Float): Float = spire.math.fun.round(a)
   def isWhole(a:Float) = a % 1.0 == 0.0
 }
 
@@ -48,7 +47,7 @@ trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
   def div(a:Double, b:Double) = a / b
   def ceil(a:Double): Double = Math.floor(a)
   def floor(a:Double): Double = Math.floor(a)
-  def round(a:Double): Double = spire.math.round(a)
+  def round(a:Double): Double = spire.math.fun.round(a)
   def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
@@ -95,5 +94,6 @@ trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
   def ceil(a:Number): Number = a.ceil
   def floor(a:Number): Number = a.floor
   def round(a:Number): Number = a.round
-  def isWhole(a:Number) = a.isWhole
+  //def isWhole(a:Number) = a.isWhole
+  def isWhole(a:Number) = a % Number.one == Number.zero
 }

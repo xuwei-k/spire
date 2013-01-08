@@ -104,24 +104,24 @@ class ComplexTest extends FunSuite {
     assert(fc.imag(z) < 0.000000001F)
   }
 
-  test("try using FloatComplex") {
-    val fc = FastComplex
-
-    val a = FloatComplex(3.0, -2.0)
-    val b = FloatComplex(2.0, 1.0)
-
-    assert(a + b === FloatComplex(5.0, -1.0))
-    assert(a - b === FloatComplex(1.0, -3.0))
-    assert(a * b === FloatComplex(8.0, -1.0))
-
-    val i = FloatComplex.i
-    val one = FloatComplex.one
-    val e = FloatComplex(scala.math.E, 0.0)
-    val pi = FloatComplex(scala.math.Pi, 0.0)
-
-    val z = e.pow(i * pi) + one
-    
-    assert(z.real == 0.0F)
-    assert(z.imag < 0.000000001F)
-  }
+  //test("try using FloatComplex") {
+  //  val fc = FastComplex
+  //
+  //  val a = FloatComplex(3.0, -2.0)
+  //  val b = FloatComplex(2.0, 1.0)
+  //
+  //  assert(a + b === FloatComplex(5.0, -1.0))
+  //  assert(a - b === FloatComplex(1.0, -3.0))
+  //  assert(a * b === FloatComplex(8.0, -1.0))
+  //
+  //  val i = FloatComplex.i
+  //  val one = FloatComplex.one
+  //  val e = FloatComplex(scala.math.E, 0.0)
+  //  val pi = FloatComplex(scala.math.Pi, 0.0)
+  //
+  //  val z = e.pow(i * pi) + one
+  //  
+  //  assert(z.real == 0.0F)
+  //  assert(z.imag < 0.000000001F)
+  //}
 }

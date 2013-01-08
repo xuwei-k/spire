@@ -2,7 +2,6 @@ package spire.benchmark
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
-import scala.reflect.ClassTag
 
 import scala.util.Random
 import Random._
@@ -45,7 +44,7 @@ class SelectionBenchmarks extends MyBenchmark {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
-  def mkarray[A:ClassTag:Order](size:Int)(init: => A): Array[A] = {
+  def mkarray[A:Manifest:Order](size:Int)(init: => A): Array[A] = {
     val data = Array.ofDim[A](size)
     var i = 0
     while (i < size) { data(i) = init; i += 1 }
@@ -55,7 +54,7 @@ class SelectionBenchmarks extends MyBenchmark {
   }
 
   override protected def setUp() {
-    val size = spire.math.pow(2, pow).toInt
+    val size = spire.math.fun.pow(2, pow).toInt
 
     is = if (typ == "int") mkarray(size, layout)(nextInt) else null
     js = if (typ == "long") mkarray(size, layout)(nextLong) else null

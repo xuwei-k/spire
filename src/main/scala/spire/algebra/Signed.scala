@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 
 import java.lang.{Math => mth}
 import scala.{ specialized => spec }
@@ -48,10 +47,10 @@ object Signed extends SignedLow {
   def apply[A](implicit s: Signed[A]): Signed[A] = s
 }
 
-final class SignedOps[A:Signed](lhs: A) {
-  def abs(): A = macro Ops.unop[A]
-  def sign(): Sign = macro Ops.unop[Sign]
-  def signum(): Int = macro Ops.unop[Int]
+final class SignedOps[A](lhs: A)(implicit ev: Signed[A]) {
+  def abs(): A = ev.abs(lhs)
+  def sign(): Sign = ev.sign(lhs)
+  def signum(): Int = ev.signum(lhs)
 }
 
 class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {

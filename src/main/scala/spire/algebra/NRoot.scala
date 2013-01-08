@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext
@@ -31,10 +30,10 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
-  def nroot(rhs: Int): A = macro Ops.binop[Int, A]
-  def sqrt(): A = macro Ops.unop[A]
-  def log(): A = macro Ops.unop[A]
-  def fpow(rhs: A): A = macro Ops.binop[A, A]
+  def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
+  def sqrt(): A = ev.sqrt(lhs)
+  def log(): A = ev.log(lhs)
+  def fpow(rhs: A): A = ev.fpow(lhs, rhs)
 
   // TODO: should be macros
   def pow(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
@@ -78,8 +77,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
   }
-  def log(a:BigDecimal) = spire.math.log(a)
-  def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
+  def log(a:BigDecimal) = spire.math.fun.log(a)
+  def fpow(a:BigDecimal, b:BigDecimal) = spire.math.fun.pow(a, b)
 }
 
 
@@ -123,7 +122,7 @@ trait LongIsNRoot extends NRoot[Long] {
     findnroot(0, 1L << ((65 - n) / n))
   }
   def log(a:Long) = Math.log(a.toDouble).toLong
-  def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
+  def fpow(a:Long, b:Long) = spire.math.fun.pow(a, b) // xyz
 }
 
 trait BigIntIsNRoot extends NRoot[BigInt] {
@@ -145,8 +144,8 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
-  def log(a:BigInt) = spire.math.log(BigDecimal(a)).toBigInt
-  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+  def log(a:BigInt) = spire.math.fun.log(BigDecimal(a)).toBigInt
+  def fpow(a:BigInt, b:BigInt) = spire.math.fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait SafeLongIsNRoot extends NRoot[SafeLong] {

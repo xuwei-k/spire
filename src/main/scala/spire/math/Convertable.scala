@@ -2,8 +2,6 @@ package spire.math
 
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
 trait ConvertableTo[@spec A] {
   def fromByte(n:Byte): A
   def fromShort(n:Short): A
@@ -516,14 +514,14 @@ object ConvertableFrom {
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
-  override def toString(): String = macro Ops.unop[String]
-  def toByte(): Byte = macro Ops.unop[Byte]
-  def toShort(): Short = macro Ops.unop[Short]
-  def toInt(): Int = macro Ops.unop[Int]
-  def toLong(): Long = macro Ops.unop[Long]
-  def toFloat(): Float = macro Ops.unop[Float]
-  def toDouble(): Double = macro Ops.unop[Double]
-  def toBigInt(): BigInt = macro Ops.unop[BigInt]
-  def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
-  def toRational(): Rational = macro Ops.unop[Rational]
+  override def toString(): String = ev.toString(lhs)
+  def toByte(): Byte = ev.toByte(lhs)
+  def toShort(): Short = ev.toShort(lhs)
+  def toInt(): Int = ev.toInt(lhs)
+  def toLong(): Long = ev.toLong(lhs)
+  def toFloat(): Float = ev.toFloat(lhs)
+  def toDouble(): Double = ev.toDouble(lhs)
+  def toBigInt(): BigInt = ev.toBigInt(lhs)
+  def toBigDecimal(): BigDecimal = ev.toBigDecimal(lhs)
+  def toRational(): Rational = ev.toRational(lhs)
 }

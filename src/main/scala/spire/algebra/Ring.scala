@@ -6,8 +6,6 @@ import scala.{specialized => spec}
 import java.lang.Math
 
 import spire.math._
-import spire.macrosk.Ops
-
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid

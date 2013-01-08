@@ -2,7 +2,6 @@ package spire.math
 
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
 import java.lang.Math
 
 trait Order[@spec A] extends Eq[A] {
@@ -32,13 +31,13 @@ class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
 }
 
 final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
-  def >(rhs: A) = macro Ops.binop[A, Boolean]
-  def >=(rhs: A) = macro Ops.binop[A, Boolean]
-  def <(rhs: A) = macro Ops.binop[A, Boolean]
-  def <=(rhs: A) = macro Ops.binop[A, Boolean]
-  def compare(rhs: A) = macro Ops.binop[A, Int]
-  def min(rhs: A) = macro Ops.binop[A, A]
-  def max(rhs: A) = macro Ops.binop[A, A]
+  def >(rhs: A) = ev.gt(lhs, rhs)
+  def >=(rhs: A) = ev.gteqv(lhs, rhs)
+  def <(rhs: A) = ev.lt(lhs, rhs)
+  def <=(rhs: A) = ev.lteqv(lhs, rhs)
+  def compare(rhs: A) = ev.compare(lhs, rhs)
+  def min(rhs: A) = ev.min(lhs, rhs)
+  def max(rhs: A) = ev.max(lhs, rhs)
 
   def >(rhs: Int)(implicit c: ConvertableTo[A]) = ev.gt(lhs, c.fromInt(rhs))
   def >=(rhs: Int)(implicit c: ConvertableTo[A]) = ev.gteqv(lhs, c.fromInt(rhs))

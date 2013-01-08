@@ -3,7 +3,6 @@ package spire.algebra
 import scala.{specialized => spec}
 
 import spire.math._
-import spire.macrosk.Ops
 
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely
@@ -38,10 +37,10 @@ trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
 }
 
 final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
-  def unary_~() = macro Ops.unop[A]
-  def &(rhs: A): A = macro Ops.binop[A, A]
-  def |(rhs: A): A = macro Ops.binop[A, A]
-  def ^(rhs: A): A = macro Ops.binop[A, A]
+  def unary_~() = ev.complement(lhs)
+  def &(rhs: A): A = ev.and(lhs, rhs)
+  def |(rhs: A): A = ev.or(lhs, rhs)
+  def ^(rhs: A): A = ev.xor(lhs, rhs)
 
   def &(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.and(lhs, c.fromInt(rhs))
   def |(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.or(lhs, c.fromInt(rhs))

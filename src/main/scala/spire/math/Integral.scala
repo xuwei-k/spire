@@ -1,7 +1,6 @@
 package spire.math
 
 import spire.algebra._
-import spire.macrosk.Ops
 
 import scala.{specialized => spec}
 
@@ -14,10 +13,10 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
 }
 
 class IntegralOps[A](lhs:A)(implicit ev:Integral[A]) {
-  def isZero() = macro Ops.unop[Boolean]
-  def isNonzero() = macro Ops.unop[Boolean]
-  def isPositive() = macro Ops.unop[Boolean]
-  def isNegative() = macro Ops.unop[Boolean]
+  def isZero() = ev.isZero(lhs)
+  def isNonzero() = ev.isNonzero(lhs)
+  def isPositive() = ev.isPositive(lhs)
+  def isNegative() = ev.isNegative(lhs)
 }
 
 object Integral {

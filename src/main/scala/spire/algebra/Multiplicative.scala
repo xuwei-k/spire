@@ -1,7 +1,6 @@
 package spire.algebra
 
 import scala.{ specialized => spec }
-import spire.macrosk.Ops
 
 trait MultiplicativeSemigroup[@spec(Int,Long,Float,Double) A] {
   def multiplicative: Semigroup[A] = new Semigroup[A] {
@@ -42,14 +41,14 @@ trait MultiplicativeAbGroup[@spec(Int,Long,Float,Double) A] extends Multiplicati
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
 final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {
-  def *(rhs:A): A = macro Ops.binop[A, A]
+  def *(rhs:A): A = ev.times(lhs, rhs)
   def *(rhs:Int)(implicit c: Ring[A]): A = ev.times(lhs, c.fromInt(rhs))
   def *(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.times(lhs, c.fromDouble(rhs))
   def *(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
-  def /(rhs:A): A = macro Ops.binop[A, A]
+  def /(rhs:A): A = ev.div(lhs, rhs)
   def /(rhs:Int)(implicit c: Ring[A]): A = ev.div(lhs, c.fromInt(rhs))
   def /(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.div(lhs, c.fromDouble(rhs))
   def /(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs

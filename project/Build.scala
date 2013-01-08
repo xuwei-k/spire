@@ -8,27 +8,27 @@ object MyBuild extends Build {
     organization := "org.spire-math",
     version := "0.3.0-M7",
 
-    scalaVersion := "2.10.0",
-    scalaBinaryVersion := "2.10.0",
+    scalaVersion := "2.9.1",
+    scalaBinaryVersion := "2.9.1",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.10.0" % "1.8" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0"
+      "org.scalatest" %% "scalatest" % "1.8" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.10.0" % "test"//,
+      //"org.scala-lang" % "scala-reflect" % "2.10.0"
     ),
 
     scalacOptions ++= Seq(
-      "-Yinline-warnings",
+      //"-Yinline-warnings",
       "-deprecation",
       "-unchecked",
-      "-optimize",
-      "-language:experimental.macros",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-feature"
+      "-optimize"//,
+      //"-language:experimental.macros",
+      //"-language:higherKinds",
+      //"-language:implicitConversions",
+      //"-feature"
     ),
 
     publishMavenStyle := true,
@@ -78,7 +78,7 @@ object MyBuild extends Build {
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
     libraryDependencies ++= Seq(
-      "com.chuusai" % "shapeless_2.10.0-RC1" % "1.2.3-SNAPSHOT"
+      //"com.chuusai" % "shapeless_2.10.0-RC1" % "1.2.3-SNAPSHOT"
     )
   )
 
@@ -100,7 +100,7 @@ object MyBuild extends Build {
       // caliper stuff
       "com.google.guava" % "guava" % "r09",
       "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
-      "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://n0d.es/jars/caliper-1.0-SNAPSHOT.jar",
+      "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
       "com.google.code.gson" % "gson" % "1.7.1"
     ),
 

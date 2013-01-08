@@ -1,14 +1,12 @@
 package spire.math
 
-import scala.reflect.ClassTag
-
 import scala.{specialized => spec}
 
 import scala.annotation.tailrec
 
 
 trait Select {
-  def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit
+  def select[@spec A: Order: Manifest](data: Array[A], k: Int): Unit
 }
 
 /**
@@ -27,7 +25,7 @@ trait SelectLike extends Select {
    * This is an in-place algorithm and is not stable and it WILL mess up the
    * order of equal elements.
    */
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) {
+  final def select[@spec A: Order: Manifest](data: Array[A], k: Int) {
     select(data, 0, data.length, 1, k)
   }
 
@@ -346,12 +344,12 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def select[@spec A: Order: Manifest](data: Array[A], k: Int) =
     quickSelect(data, k)
 
-  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def linearSelect[@spec A: Order: Manifest](data: Array[A], k: Int) =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def quickSelect[@spec A: Order: Manifest](data: Array[A], k: Int) =
     QuickSelect.select(data, k)
 }

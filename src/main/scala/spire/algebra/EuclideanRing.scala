@@ -1,13 +1,13 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
+import java.lang.Math
 
 trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def quot(a:A, b:A):A
@@ -23,9 +23,9 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
 }
 
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
-  def /~(rhs:A) = macro Ops.binop[A, A]
-  def %(rhs:A) = macro Ops.binop[A, A]
-  def /%(rhs:A) = macro Ops.binop[A, A]
+  def /~(rhs:A) = ev.quot(lhs, rhs)
+  def %(rhs:A) = ev.mod(lhs, rhs)
+  def /%(rhs:A) = ev.quotmod(lhs, rhs)
 
   def /~(rhs:Int): A = ev.quot(lhs, ev.fromInt(rhs))
   def %(rhs:Int): A = ev.mod(lhs, ev.fromInt(rhs))
@@ -70,13 +70,13 @@ object EuclideanRing {
 trait IntIsEuclideanRing extends EuclideanRing[Int] with IntIsRing {
   def quot(a:Int, b:Int) = a / b
   def mod(a:Int, b:Int) = a % b
-  override def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
+  override def gcd(a:Int, b:Int): Int = spire.math.fun.gcd(a, b).toInt
 }
 
 trait LongIsEuclideanRing extends EuclideanRing[Long] with LongIsRing {
   def quot(a:Long, b:Long) = a / b
   def mod(a:Long, b:Long) = a % b
-  override def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
+  override def gcd(a:Long, b:Long) = spire.math.fun.gcd(a, b)
 }
 
 trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {

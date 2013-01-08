@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.math.fun._
 import scala.annotation.tailrec
 
 object ULong {
@@ -22,7 +23,7 @@ object ULong {
   }
 }
 
-class ULong(val signed: Long) extends AnyVal {
+class ULong(val signed: Long) {
   final def toByte: Byte = signed.toByte
   final def toChar: Char = signed.toChar
   final def toShort: Short = signed.toShort

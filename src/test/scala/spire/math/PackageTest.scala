@@ -3,6 +3,8 @@ package spire.math
 import org.scalatest.FunSuite
 
 class PackageTest extends FunSuite {
+  import spire.math.fun._
+
   test("pow(Int, Int)") {
     assert(pow(2, 2) === 4)
   }

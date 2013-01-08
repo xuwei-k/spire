@@ -1,21 +1,15 @@
 package spire.math
 
-import scala.language.experimental.macros
-
 import java.math.MathContext
 
 import scala.{ specialized => spec }
-
-import spire.macrosk._
-
 
 /**
  * A type class for numeric conversions. All conversions must extend either
  * `NarrowingConversion` for those lose information, and `WideningConversion`
  * for those that are guaranteed not to lose any information.
  */
-sealed trait Conversion[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                        @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B] {
+sealed trait Conversion[@spec A, @spec B] {
   def convert(a: A): B
 }
 
@@ -28,8 +22,7 @@ sealed trait Conversion[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
  * It should be noted that `Int` -> `Float` and `Long` -> `Double` are not
  * widening conversions.
  */
-trait WideningConversion[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                         @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B] extends Conversion[A, B] {
+trait WideningConversion[@spec A, @spec B] extends Conversion[A, B] {
   def widen(a: A): B = convert(a)
 }
 
@@ -41,8 +34,7 @@ trait WideningConversion[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
  *
  * Both `Int` -> `Float` and `Long` -> `Double` are narrowing conversions.
  */
-trait NarrowingConversion[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                          @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B] extends Conversion[A, B] {
+trait NarrowingConversion[@spec A, @spec B] extends Conversion[A, B] {
   def narrow(a: A): B = convert(a)
 }
 
@@ -51,8 +43,7 @@ object Conversion {
   type FromInt[A] = WideningConversion[Int, A]
   type ToDouble[A] = NarrowingConversion[A, Double]
 
-  def apply[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-            @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit c: Conversion[A, B]) = c
+  def apply[@spec A, @spec B](implicit c: Conversion[A, B]) = c
 }
 
 
@@ -72,15 +63,13 @@ trait WideningConversionLow {
 
 
 object WideningConversion extends WideningConversionLow {
-  def apply[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-            @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit c: WideningConversion[A, B]) = c
+  def apply[@spec A, @spec B](implicit c: WideningConversion[A, B]) = c
   
-  def widen[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-            @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](f: A => B) = new WideningConversion[A, B] {
+  def widen[@spec A, @spec B](f: A => B) = new WideningConversion[A, B] {
     def convert(a: A): B = f(a)
   }
 
-  implicit def identity[@spec A] = new WideningConversion[A, A] {
+  implicit def identity[A] = new WideningConversion[A, A] {
     def convert(a: A): A = a
   }
 
@@ -152,8 +141,7 @@ object WideningConversion extends WideningConversionLow {
 
 
 trait NarrowingConversionLow {
-  implicit def widen[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                     @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit
+  implicit def widen[@spec A, @spec B](implicit
       c: WideningConversion[A, B]) = {
     new NarrowingConversion[A, B] {
       def convert(a: A): B = c.convert(a)
@@ -162,11 +150,9 @@ trait NarrowingConversionLow {
 }
 
 object NarrowingConversion extends NarrowingConversionLow {
-  def apply[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-            @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit c: NarrowingConversion[A, B]) = c
+  def apply[@spec A, @spec B](implicit c: NarrowingConversion[A, B]) = c
 
-  def narrow[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-             @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](f: A => B) = new NarrowingConversion[A, B] {
+  def narrow[@spec A, @spec B](f: A => B) = new NarrowingConversion[A, B] {
     def convert(a: A): B = f(a)
   }
 
@@ -264,4 +250,3 @@ object NarrowingConversion extends NarrowingConversionLow {
   (implicit c: NarrowingConversion[A, B], f: Integral[B]) =
     narrow[A, Gaussian[B]](x => Gaussian(c.convert(x), Integral[B].zero))
 }
-

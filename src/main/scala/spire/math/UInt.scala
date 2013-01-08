@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.math.fun._
+
 object UInt {
   @inline final def apply(n: Int) = new UInt(n)
   @inline final def apply(n: Long) = new UInt(n.toInt)
@@ -8,7 +10,7 @@ object UInt {
   @inline final val MaxValue = UInt(-1)
 }
 
-class UInt(val signed: Int) extends AnyVal {
+class UInt(val signed: Int) {
   def toByte: Byte = signed.toByte
   def toChar: Char = signed.toChar
   def toShort: Short = signed.toShort

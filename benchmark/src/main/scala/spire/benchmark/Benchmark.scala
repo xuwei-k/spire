@@ -1,7 +1,5 @@
 package spire.benchmark
 
-import scala.reflect.ClassTag
-
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.util.Random
@@ -27,7 +25,7 @@ trait MyBenchmark extends SimpleBenchmark {
   /**
    * Sugar for building arrays using a per-cell init function.
    */
-  def init[A:ClassTag](size:Int)(f: => A) = {
+  def init[A:Manifest](size:Int)(f: => A) = {
     val data = Array.ofDim[A](size)
     for (i <- 0 until size) data(i) = f
     data
@@ -36,15 +34,15 @@ trait MyBenchmark extends SimpleBenchmark {
   /**
    * Sugar for building arrays using a per-cell init function.
    */
-  def mkarray[A:ClassTag:Order](size:Int, layout:String)(f: => A): Array[A] = {
+  def mkarray[A:Manifest:Order](size:Int, layout:String)(f: => A): Array[A] = {
     val data = init(size)(f)
-    val ct = implicitly[ClassTag[A]]
+    val ct = implicitly[Manifest[A]]
     val order = Order[A]
     layout match {
       case "random" =>
       case "sorted" => spire.math.Sorting.sort(data)(order, ct)
       case "reversed" => spire.math.Sorting.sort(data)(order.reverse, ct)
-      case _ => sys.error(s"unknown layout: $layout")
+      case _ => sys.error("unknown layout: %s" format layout)
     }
     data
   }

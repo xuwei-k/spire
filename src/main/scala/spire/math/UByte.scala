@@ -1,11 +1,13 @@
 package spire.math
 
+import spire.math.fun._
+
 object UByte {
   @inline final def apply(n: Byte) = new UByte(n)
   @inline final def apply(n: Int) = new UByte(n.toByte)
 }
 
-class UByte(val signed: Byte) extends AnyVal {
+class UByte(val signed: Byte) {
   def toByte: Byte = signed
   def toChar: Char = (signed & 0xff).toChar
   def toShort: Short = (signed & 0xff).toShort

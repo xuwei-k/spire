@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 
 trait NormedVectorSpace[V, @spec(Int, Long, Float, Double) F]
@@ -20,9 +18,6 @@ trait NormedVectorSpace0 {
 object NormedVectorSpace extends NormedVectorSpace0
 
 final class NormedVectorSpaceOps[V](lhs: V) {
-  def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], F]
-
-  def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
+  def norm[F](implicit ev: NormedVectorSpace[V, F]): F = ev.norm(lhs)
+  def normalize[F](implicit ev: NormedVectorSpace[V, F]): V = ev.normalize(lhs)
 }

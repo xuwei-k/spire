@@ -244,7 +244,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
     case that => unifiedPrimitiveEquals(that)
   }
 
-  def gcd(that: SafeLong) = spire.math.gcd(x, that.fold(identity, n => (n % x).toLong))
+  def gcd(that: SafeLong) = fun.gcd(x, that.fold(identity, n => (n % x).toLong))
 
   def doubleValue: Double = x.toDouble
   def floatValue: Float = x.toFloat
@@ -308,7 +308,7 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   }
 
   def gcd(that: SafeLong) = that match {
-    case SafeLongLong(y) => spire.math.gcd((x % y).toLong, y)
+    case SafeLongLong(y) => fun.gcd((x % y).toLong, y)
     case SafeLongBigInt(y) => x.gcd(y)
   }
 

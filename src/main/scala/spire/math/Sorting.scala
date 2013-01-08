@@ -1,6 +1,5 @@
 package spire.math
 
-import scala.reflect.ClassTag
 import scala.{specialized => spec}
 import scala.annotation.tailrec
 //import scala.math.min
@@ -9,7 +8,7 @@ import scala.annotation.tailrec
  *  Interface for a sorting strategy object.
  */
 trait Sort {
-  def sort[@spec A:Order:ClassTag](data:Array[A]): Unit
+  def sort[@spec A:Order:Manifest](data:Array[A]): Unit
 }
 
 /**
@@ -18,11 +17,11 @@ trait Sort {
  * Works for small arrays but due to O(n^2) complexity is not generally good.
  */
 object InsertionSort extends Sort {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) =
+  final def sort[@spec A:Order:Manifest](data:Array[A]) =
     sort(data, 0, data.length)
 
   final def sort[@spec A](data:Array[A], start:Int, end:Int)
-    (implicit o:Order[A], ct:ClassTag[A]) {
+    (implicit o:Order[A], ct:Manifest[A]) {
 
     var i = start + 1
     while (i < end) {
@@ -48,7 +47,7 @@ object MergeSort extends Sort {
   @inline final def startWidth = 8
   @inline final def startStep = 16
 
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) {
+  final def sort[@spec A:Order:Manifest](data:Array[A]) {
     val len = data.length
 
     if (len <= startStep) return InsertionSort.sort(data)
@@ -70,7 +69,7 @@ object MergeSort extends Sort {
         merge(buf1, buf2, i, i + width, i + step); i += step
       }
       while (i < len) {
-        merge(buf1, buf2, i, min(i + width, len), len); i += step
+        merge(buf1, buf2, i, fun.min(i + width, len), len); i += step
       }
       tmp = buf2
       buf2 = buf1
@@ -115,11 +114,11 @@ object MergeSort extends Sort {
 object QuickSort {
   @inline final def limit = 16
 
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = qsort(data, 0, data.length - 1)
+  final def sort[@spec A:Order:Manifest](data:Array[A]) = qsort(data, 0, data.length - 1)
 
   final def qsort[@spec A]
     (data:Array[A], left: Int, right: Int)
-    (implicit o:Order[A], ct:ClassTag[A]) {
+    (implicit o:Order[A], ct:Manifest[A]) {
 
     if (right - left < limit) return InsertionSort.sort(data, left, right + 1)
 
@@ -131,7 +130,7 @@ object QuickSort {
 
   final def partition[@spec A]
     (data:Array[A], left:Int, right:Int, pivot:Int)
-    (implicit o:Order[A], ct:ClassTag[A]): Int = {
+    (implicit o:Order[A], ct:Manifest[A]): Int = {
 
     val value = data(pivot)
 
@@ -166,9 +165,9 @@ object QuickSort {
  * insertionSort(), which is slow except for small arrays.
  */
 object Sorting {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = QuickSort.sort(data)
+  final def sort[@spec A:Order:Manifest](data:Array[A]) = QuickSort.sort(data)
 
-  final def insertionSort[@spec A:Order:ClassTag](data:Array[A]) = InsertionSort.sort(data)
-  final def mergeSort[@spec A:Order:ClassTag](data:Array[A]) = MergeSort.sort(data)
-  final def quickSort[@spec K:Order:ClassTag](data:Array[K]) = QuickSort.sort(data)
+  final def insertionSort[@spec A:Order:Manifest](data:Array[A]) = InsertionSort.sort(data)
+  final def mergeSort[@spec A:Order:Manifest](data:Array[A]) = MergeSort.sort(data)
+  final def quickSort[@spec K:Order:Manifest](data:Array[K]) = QuickSort.sort(data)
 }

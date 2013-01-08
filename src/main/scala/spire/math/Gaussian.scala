@@ -1,6 +1,7 @@
 package spire.math
 
 import spire.algebra._
+import spire.math.fun._
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
@@ -28,7 +29,7 @@ object Gaussian {
 }
 
 final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Integral[T])
-    extends ScalaNumber with ScalaNumericConversions with Serializable {
+    extends ScalaNumber with ScalaNumericConversions {
 
   def doubleValue: Double = f.toDouble(real)
   def floatValue: Float = f.toFloat(real)

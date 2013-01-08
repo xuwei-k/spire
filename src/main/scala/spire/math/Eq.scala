@@ -3,7 +3,6 @@ package spire.math
 import scala.{specialized => spec}
 
 import spire.algebra.Zero
-import spire.macrosk.Ops
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -16,8 +15,8 @@ class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
 }
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
-  def ===(rhs:A) = macro Ops.binop[A, Boolean]
-  def =!=(rhs:A) = macro Ops.binop[A, Boolean]
+  def ===(rhs:A) = ev.eqv(lhs, rhs)
+  def =!=(rhs:A) = ev.neqv(lhs, rhs)
 }
 
 object Eq extends LowPriority {

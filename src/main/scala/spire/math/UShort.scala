@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.math.fun._
+
 object UShort {
   @inline final def apply(n: Char) = new UShort(n)
   @inline final def apply(n: Short) = new UShort(n.toChar)
@@ -9,7 +11,7 @@ object UShort {
   @inline final def MaxValue = UShort(Char.MaxValue)
 }
 
-class UShort(val signed: Char) extends AnyVal {
+class UShort(val signed: Char) {
   def toByte: Byte = signed.toByte
   def toChar: Char = signed
   def toShort: Short = signed.toShort

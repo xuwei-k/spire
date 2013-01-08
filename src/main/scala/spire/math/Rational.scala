@@ -357,8 +357,8 @@ object Rational {
     def findnroot(prev: Long, add: Long): (Long, Long) = {
       val min = prev | add
       val max = min + 1
-      val fl = pow(min, n)
-      val cl = pow(max, n)
+      val fl = fun.pow(min, n)
+      val cl = fun.pow(max, n)
 
       if (fl <= 0 || fl > x) {
         findnroot(prev, add >> 1)
@@ -468,7 +468,7 @@ object LongRationals extends Rationals[Long] {
   }
 
   def unsafeBuild(n: Long, d: Long): Rational = {
-    val divisor = gcd(n, d)
+    val divisor = fun.gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
         Rational(SafeLong(-n), SafeLong(-d))
@@ -499,7 +499,7 @@ object LongRationals extends Rationals[Long] {
 
     def +(r: Rational): Rational = r match {
       case r: LongRational =>
-        val dgcd: Long = gcd(d, r.d)
+        val dgcd: Long = fun.gcd(d, r.d)
         if (dgcd == 1L) {
 
           val num = SafeLong(n) * r.d + SafeLong(r.n) * d
@@ -511,14 +511,14 @@ object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
           val num: SafeLong = SafeLong(n) * rden + SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(gcd(_, dgcd), num => gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num.fold(fun.gcd(_, dgcd), num => fun.gcd(dgcd, (num % dgcd).toLong))
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
             Rational(num / ngcd, SafeLong(lden) * (r.d / ngcd))
         }
       case r: BigRational =>
-        val dgcd: Long = gcd(d, (r.d % d).toLong)
+        val dgcd: Long = fun.gcd(d, (r.d % d).toLong)
         if (dgcd == 1L) {
 
           val num = SafeLong(r.d * n + r.n * d)
@@ -530,7 +530,7 @@ object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: SafeLong = SafeLong(r.d) / dgcd
           val num: SafeLong = rden * n + SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(gcd(_, dgcd), num => gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num.fold(fun.gcd(_, dgcd), num => fun.gcd(dgcd, (num % dgcd).toLong))
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
@@ -542,7 +542,7 @@ object LongRationals extends Rationals[Long] {
 
     def -(r: Rational): Rational = r match {
       case r: LongRational =>
-        val dgcd: Long = gcd(d, r.d)
+        val dgcd: Long = fun.gcd(d, r.d)
         if (dgcd == 1L) {
 
           val num = SafeLong(n) * r.d - SafeLong(r.n) * d
@@ -554,14 +554,14 @@ object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
           val num: SafeLong = SafeLong(n) * rden - SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(gcd(_, dgcd), num => gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num.fold(fun.gcd(_, dgcd), num => fun.gcd(dgcd, (num % dgcd).toLong))
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
             Rational(num / ngcd, SafeLong(lden) * (r.d / ngcd))
         }
       case r: BigRational =>
-        val dgcd: Long = gcd(d, (r.d % d).toLong)
+        val dgcd: Long = fun.gcd(d, (r.d % d).toLong)
         if (dgcd == 1L) {
 
           val num = SafeLong(r.d * n - r.n * d)
@@ -573,7 +573,7 @@ object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: SafeLong = SafeLong(r.d) / dgcd
           val num: SafeLong = rden * n - SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(gcd(_, dgcd), num => gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num.fold(fun.gcd(_, dgcd), num => fun.gcd(dgcd, (num % dgcd).toLong))
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
@@ -585,12 +585,12 @@ object LongRationals extends Rationals[Long] {
 
     def *(r: Rational): Rational = r match {
       case r: LongRational =>
-        val a = gcd(n, r.d)
-        val b = gcd(d, r.n)
+        val a = fun.gcd(n, r.d)
+        val b = fun.gcd(d, r.n)
         Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
       case r: BigRational =>
-        val a = gcd(n, (r.d % n).toLong)
-        val b = gcd(d, (r.n % d).toLong)
+        val a = fun.gcd(n, (r.d % n).toLong)
+        val b = fun.gcd(d, (r.n % d).toLong)
         Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
     }
 
@@ -599,15 +599,15 @@ object LongRationals extends Rationals[Long] {
       if (r == Rational.zero) throw new IllegalArgumentException("/ by 0")
       r match {
         case r: LongRational => {
-          val a = gcd(n, r.n)
-          val b = gcd(d, r.d)
+          val a = fun.gcd(n, r.n)
+          val b = fun.gcd(d, r.d)
           val num = SafeLong(n / a) * (r.d / b)
           val den = SafeLong(d / b) * (r.n / a)
           if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
         }
         case r: BigRational => {
-          val a = gcd(n, (r.n % n).toLong)
-          val b = gcd(d, (r.d % d).toLong)
+          val a = fun.gcd(n, (r.n % n).toLong)
+          val b = fun.gcd(d, (r.d % d).toLong)
           val num = SafeLong(n / a) * (r.d / b)
           val den = SafeLong(d / b) * (r.n / a)
           if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
@@ -623,9 +623,9 @@ object LongRationals extends Rationals[Long] {
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
     else if (exp < 0)
-      BigRationals.build(spire.math.pow(d, -exp), spire.math.pow(n, -exp))
+      BigRationals.build(fun.pow(d, -exp), fun.pow(n, -exp))
     else
-      BigRationals.build(spire.math.pow(n, exp), spire.math.pow(d, exp))
+      BigRationals.build(fun.pow(n, exp), fun.pow(d, exp))
 
     def log() = Rational(Math.log(n) - Math.log(d))
 
@@ -633,14 +633,14 @@ object LongRationals extends Rationals[Long] {
 
     def compare(r: Rational): Int = r match {
       case r: LongRational =>
-        val dgcd = gcd(d, r.d)
+        val dgcd = fun.gcd(d, r.d)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
 
       case r: BigRational =>
-        val dgcd = gcd(d, (r.d % d).toLong)
+        val dgcd = fun.gcd(d, (r.d % d).toLong)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
         else
@@ -754,13 +754,13 @@ object BigRationals extends Rationals[BigInt] {
     else
       BigRationals.build(n pow exp, d pow exp)
 
-    def log() = Rational(spire.math.log(BigDecimal(n)) - spire.math.log(BigDecimal(d)))
+    def log() = Rational(fun.log(BigDecimal(n)) - fun.log(BigDecimal(d)))
 
     def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
       case r: LongRational => {
-        val dgcd = gcd(r.d, (d % r.d).toLong)
+        val dgcd = fun.gcd(r.d, (d % r.d).toLong)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
         else

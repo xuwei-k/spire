@@ -1,6 +1,6 @@
 package spire.algebra
 
-import scala.reflect.ClassTag
+import scala.reflect.Manifest
 
 // scalatest
 import org.scalatest.FunSuite
@@ -25,9 +25,9 @@ class RingTest extends FunSuite {
    *
    *   a=-3  b=3  c=-9
    */
-  def runWith[@spec A:Ring:ClassTag](cls:String)(a:A, b:A, c:A) {
+  def runWith[@spec A:Ring:Manifest](cls:String)(a:A, b:A, c:A) {
 
-    val m = implicitly[ClassTag[A]]
+    val m = implicitly[Manifest[A]]
 
     //// the name to use for this A
     //val cls = m.typeArguments match {

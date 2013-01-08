@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 
 trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
@@ -17,6 +15,6 @@ trait VectorSpace0 {
 
 object VectorSpace extends VectorSpace0
 
-final class VectorSpaceOps[V, F](rhs: V)(implicit ev: VectorSpace[V, F]) {
-  def :/ (rhs:F): V = macro Ops.binop[F, V]
+final class VectorSpaceOps[V, F](lhs: V)(implicit ev: VectorSpace[V, F]) {
+  def :/ (rhs:F): V = ev.divr(lhs, rhs)
 }

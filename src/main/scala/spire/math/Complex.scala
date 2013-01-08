@@ -1,9 +1,11 @@
 package spire.math
 
 import spire.algebra._
+import spire.math.fun._
 
 import scala.{specialized => spec}
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+import java.lang.Math
 
 object Complex {
   def i[@spec(Float, Double) T](implicit f: Fractional[T], t: Trig[T]) =
@@ -41,7 +43,7 @@ object Complex {
 }
 
 final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: Fractional[T], t: Trig[T])
-    extends ScalaNumber with ScalaNumericConversions with Serializable {
+    extends ScalaNumber with ScalaNumericConversions {
 
   def doubleValue: Double = f.toDouble(real)
   def floatValue: Float = f.toFloat(real)
@@ -348,62 +350,62 @@ object FastComplex {
   } else if (imag(b) != 0.0F) {
     val im_b = imag(b)
     val re_b = real(b)
-    val len = (math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat
+    val len = (Math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat
     val phase = (angle(a) * re_b + log(abs(a)) * im_b).toFloat
     polar(len, phase)
 
   } else {
-    val len = math.pow(abs(a), real(b)).toFloat
+    val len = Math.pow(abs(a), real(b)).toFloat
     val phase = (angle(a) * real(b)).toFloat
     polar(len, phase)
   }
 }
 
-object FloatComplex {
-  import FastComplex.{encode}
-
-  final def apply(real: Float, imag: Float): FloatComplex =
-    new FloatComplex(encode(real, imag))
-
-  final def apply(real: Double, imag: Double) =
-    new FloatComplex(encode(real.toFloat, imag.toFloat))
-
-  def polar(magnitude: Float, angle: Float) =
-    new FloatComplex(FastComplex.polar(magnitude, angle))
-
-  final val i = new FloatComplex(4575657221408423936L)
-  final val one = new FloatComplex(1065353216L)
-  final val zero = new FloatComplex(0L)
-}
-
-class FloatComplex(val u: Long) extends AnyVal {
-  override def toString: String = "FloatComplex(%s, %s)" format (real, imag)
-
-  def real: Float = FastComplex.real(u)
-  def imag: Float = FastComplex.imag(u)
-  def repr = "FloatComplex(%s, %s)" format(real, imag)
-  def abs: Float = FastComplex.abs(u)
-  def angle: Float = FastComplex.angle(u)
-  def conjugate = new FloatComplex(FastComplex.conjugate(u))
-  def isWhole: Boolean = FastComplex.isWhole(u)
-  def signum: Int = FastComplex.signum(u)
-  def complexSignum = new FloatComplex(FastComplex.complexSignum(u))
-  def negate = new FloatComplex(FastComplex.negate(u))
-
-  def +(b: FloatComplex) = new FloatComplex(FastComplex.add(u, b.u))
-  def -(b: FloatComplex) = new FloatComplex(FastComplex.subtract(u, b.u))
-  def *(b: FloatComplex) = new FloatComplex(FastComplex.multiply(u, b.u))
-  def /(b: FloatComplex) = new FloatComplex(FastComplex.divide(u, b.u))
-  def /~(b: FloatComplex) = new FloatComplex(FastComplex.quot(u, b.u))
-  def %(b: FloatComplex) = new FloatComplex(FastComplex.mod(u, b.u))
-
-  def /%(b: FloatComplex) = FastComplex.quotmod(u, b.u) match {
-    case (q, m) => (new FloatComplex(q), new FloatComplex(m))
-  }
-
-  def pow(b: FloatComplex) = new FloatComplex(FastComplex.pow(u, b.u))
-  def **(b: FloatComplex) = pow(b)
-
-  def pow(b: Int) = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
-  def **(b: Int) = pow(b)
-}
+//object FloatComplex {
+//  import FastComplex.{encode}
+//
+//  final def apply(real: Float, imag: Float): FloatComplex =
+//    new FloatComplex(encode(real, imag))
+//
+//  final def apply(real: Double, imag: Double) =
+//    new FloatComplex(encode(real.toFloat, imag.toFloat))
+//
+//  def polar(magnitude: Float, angle: Float) =
+//    new FloatComplex(FastComplex.polar(magnitude, angle))
+//
+//  final val i = new FloatComplex(4575657221408423936L)
+//  final val one = new FloatComplex(1065353216L)
+//  final val zero = new FloatComplex(0L)
+//}
+//
+//class FloatComplex(val u: Long) extends AnyVal {
+//  override def toString: String = "FloatComplex(%s, %s)" format (real, imag)
+//
+//  def real: Float = FastComplex.real(u)
+//  def imag: Float = FastComplex.imag(u)
+//  def repr = "FloatComplex(%s, %s)" format(real, imag)
+//  def abs: Float = FastComplex.abs(u)
+//  def angle: Float = FastComplex.angle(u)
+//  def conjugate = new FloatComplex(FastComplex.conjugate(u))
+//  def isWhole: Boolean = FastComplex.isWhole(u)
+//  def signum: Int = FastComplex.signum(u)
+//  def complexSignum = new FloatComplex(FastComplex.complexSignum(u))
+//  def negate = new FloatComplex(FastComplex.negate(u))
+//
+//  def +(b: FloatComplex) = new FloatComplex(FastComplex.add(u, b.u))
+//  def -(b: FloatComplex) = new FloatComplex(FastComplex.subtract(u, b.u))
+//  def *(b: FloatComplex) = new FloatComplex(FastComplex.multiply(u, b.u))
+//  def /(b: FloatComplex) = new FloatComplex(FastComplex.divide(u, b.u))
+//  def /~(b: FloatComplex) = new FloatComplex(FastComplex.quot(u, b.u))
+//  def %(b: FloatComplex) = new FloatComplex(FastComplex.mod(u, b.u))
+//
+//  def /%(b: FloatComplex) = FastComplex.quotmod(u, b.u) match {
+//    case (q, m) => (new FloatComplex(q), new FloatComplex(m))
+//  }
+//
+//  def pow(b: FloatComplex) = new FloatComplex(FastComplex.pow(u, b.u))
+//  def **(b: FloatComplex) = pow(b)
+//
+//  def pow(b: Int) = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
+//  def **(b: Int) = pow(b)
+//}

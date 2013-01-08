@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
@@ -14,5 +12,5 @@ object Semigroup {
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
-  def |+|(rhs:A) = macro Ops.binop[A, A]
+  def |+|(rhs:A) = ev.op(lhs, rhs)
 }

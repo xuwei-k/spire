@@ -6,7 +6,6 @@ import scala.{specialized => spec}
 import java.lang.Math
 
 import spire.math._
-import spire.macrosk.Ops
 
 
 /**
@@ -25,8 +24,8 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] with Multipl
 }
 
 final class RigOps[A](lhs:A)(implicit ev:Rig[A]) {
-  def pow(rhs:Int) = macro Ops.binop[Int, A]
-  def **(rhs:Int) = macro Ops.binop[Int, A]
+  def pow(rhs:Int) = ev.pow(lhs, rhs)
+  def **(rhs:Int) = ev.pow(lhs, rhs)
 }
 
 object Rig {

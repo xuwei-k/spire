@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 /**
  * A group is a monoid where each element has an inverse.
  */
@@ -19,5 +17,5 @@ object Group {
 trait AbGroup[A] extends Group[A]
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
-  def inverse() = macro Ops.unop[A]
+  def inverse() = ev.inverse(lhs)
 }

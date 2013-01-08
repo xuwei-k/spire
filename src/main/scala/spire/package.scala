@@ -1,18 +1,16 @@
 package spire
 
-import scala.reflect.ClassTag
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 
 import spire.algebra._
 import spire.math._
-import spire.macrosk._
 
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
 
-final class LiteralIntOps(val lhs:Int) extends AnyVal {
+final class LiteralIntOps(val lhs:Int) {
   @inline private final def q = Rational(lhs, 1)
 
   def +[A](rhs:A)(implicit ev:Ring[A]) = ev.plus(ev.fromInt(lhs), rhs)
@@ -69,9 +67,9 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def **(rhs:Int) = Ring[Int].pow(lhs, rhs)
 }
 
-final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
-  def pow(rhs:Double) = spire.math.pow(lhs, rhs)
-  def **(rhs:Double) = spire.math.pow(lhs, rhs)
+final class LiteralDoubleOps(val lhs:Double) {
+  def pow(rhs:Double) = fun.pow(lhs, rhs)
+  def **(rhs:Double) = fun.pow(lhs, rhs)
 
   @inline private final def c[A:Fractional:ConvertableTo:Trig]:Complex[A] =
     Complex(ConvertableFrom[Double].toType[A](lhs), Fractional[A].zero)
@@ -156,45 +154,45 @@ final class ArrayOps[@spec A](arr:Array[A]) {
       
   import spire.math.{Sorting, Selection}
 
-  def qsort(implicit ev:Order[A], ct:ClassTag[A]) {
+  def qsort(implicit ev:Order[A], ct:Manifest[A]) {
     Sorting.sort(arr)
   }
 
-  def qsortBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]) {
+  def qsortBy[@spec B](f:A => B)(implicit ev:Order[B], ct:Manifest[A]) {
     implicit val ord: Order[A] = ev.on(f)
     Sorting.sort(arr)
   }
 
-  def qsortWith(f:(A, A) => Int)(implicit ct:ClassTag[A]) {
+  def qsortWith(f:(A, A) => Int)(implicit ct:Manifest[A]) {
     implicit val ord: Order[A] = Order.from(f)
     Sorting.sort(arr)
   }
 
-  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Array[A] = {
+  def qsorted(implicit ev:Order[A], ct:Manifest[A]): Array[A] = {
     val arr2 = arr.clone
     Sorting.sort(arr2)
     arr2
   }
 
-  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Array[A] = {
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:Manifest[A]): Array[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr2 = arr.clone
     Sorting.sort(arr2)
     arr2
   }
 
-  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Array[A] = {
+  def qsortedWith(f:(A, A) => Int)(implicit ct:Manifest[A]): Array[A] = {
     implicit val ord: Order[A] = Order.from(f)
     val arr2 = arr.clone
     Sorting.sort(arr2)
     arr2
   }
 
-  def qselect(k: Int)(implicit ev:Order[A], ct:ClassTag[A]) {
+  def qselect(k: Int)(implicit ev:Order[A], ct:Manifest[A]) {
     Selection.select(arr, k)
   }
 
-  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Array[A] = {
+  def qselected(k: Int)(implicit ev:Order[A], ct:Manifest[A]): Array[A] = {
     val arr2 = arr.clone
     Selection.select(arr2, k)
     arr2
@@ -250,7 +248,7 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
 
   import spire.math.{Sorting, Selection}
 
-  protected[this] def toSizeAndArray(implicit ct:ClassTag[A]) = {
+  protected[this] def toSizeAndArray(implicit ct:Manifest[A]) = {
     val len = as.size
     val arr = new Array[A](len)
     var i = 0
@@ -272,27 +270,27 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
     b.result
   }
 
-  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qsorted(implicit ev:Order[A], ct:Manifest[A]): Seq[A] = {
     val (len, arr) = toSizeAndArray
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Seq[A] = {
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:Manifest[A]): Seq[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = ev.on(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Seq[A] = {
+  def qsortedWith(f:(A, A) => Int)(implicit ct:Manifest[A]): Seq[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = Order.from(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qselected(k: Int)(implicit ev:Order[A], ct:Manifest[A]): Seq[A] = {
     val (len, arr) = toSizeAndArray
     Selection.select(arr, k)
     fromSizeAndArray(len, arr)
@@ -301,11 +299,8 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
 
 
 final class ConversionOps[A](a: A) {
-  def narrow[B](implicit rhs: NarrowingConversion[A, B]): B =
-    macro Ops.flip[NarrowingConversion[A, B], B]
-
-  def widen[B](implicit rhs: WideningConversion[A, B]): B =
-    macro Ops.flip[WideningConversion[A, B], B]
+  def narrow[B](implicit rhs: NarrowingConversion[A, B]): B = rhs.narrow(a)
+  def widen[B](implicit rhs: WideningConversion[A, B]): B = rhs.widen(a)
 }
 
 trait LowViz {
@@ -349,8 +344,8 @@ object implicits extends LowViz {
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
 
-  implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
-  implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
+  //implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
+  //implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
 
@@ -359,20 +354,21 @@ object implicits extends LowViz {
   implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
 
-object syntax {
-  import spire.macrosk._
-  def cfor[A](init:A)(test:A => Boolean, next:A => A)(body:A => Unit): Unit =
-    macro Syntax.cforMacro[A]
+// object syntax {
+//   import spire.macrosk._
+//   def cfor[A](init:A)(test:A => Boolean, next:A => A)(body:A => Unit): Unit =
+//     macro Syntax.cforMacro[A]
 
-  implicit def literals(s:StringContext) = new Literals(s)
+//   implicit def literals(s:StringContext) = new Literals(s)
 
-  object radix { implicit def radix(s:StringContext) = new Radix(s) }
-  object si { implicit def siLiterals(s:StringContext) = new SiLiterals(s) }
-  object us { implicit def usLiterals(s:StringContext) = new UsLiterals(s) }
-  object eu { implicit def euLiterals(s:StringContext) = new EuLiterals(s) }
-}
+//   object radix { implicit def radix(s:StringContext) = new Radix(s) }
+//   object si { implicit def siLiterals(s:StringContext) = new SiLiterals(s) }
+//   object us { implicit def usLiterals(s:StringContext) = new UsLiterals(s) }
+//   object eu { implicit def euLiterals(s:StringContext) = new EuLiterals(s) }
+// }
 
-package object math {
+package math {
+object fun {
   // largest possible double as BigDecimal
   private final val maxDouble = BigDecimal(Double.MaxValue)
 
@@ -497,4 +493,5 @@ package object math {
   @inline final def max(x: Float, y: Float): Float = Math.max(x, y)
   @inline final def max(x: Double, y: Double): Double = Math.max(x, y)
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
+}
 }

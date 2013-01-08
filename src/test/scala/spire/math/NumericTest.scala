@@ -1,7 +1,5 @@
 package spire.math
 
-import scala.reflect.ClassTag
-
 // scalatest
 import org.scalatest.FunSuite
 
@@ -21,11 +19,11 @@ class NumericTest extends FunSuite {
    *
    *   a=-3  b=3  c=9
    */
-  def runWith[@spec A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A) {
+  def runWith[@spec A:Numeric:Manifest](cls:String)(a:A, b:A, c:A) {
 
     // the name to use for this A
-    //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
-    //val cls = implicitly[ClassTag[A]].runtimeClass.getName
+    //val cls = implicitly[Manifest[A]].erasure.getSimpleName
+    //val cls = implicitly[Manifest[A]].runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
