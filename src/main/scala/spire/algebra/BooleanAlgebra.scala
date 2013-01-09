@@ -36,7 +36,7 @@ trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
   }
 }
 
-final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
+final class BooleanAlgebraOps[@spec(Boolean,Byte,Short,Int,Long) A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
   def unary_~() = ev.complement(lhs)
   def &(rhs: A): A = ev.and(lhs, rhs)
   def |(rhs: A): A = ev.or(lhs, rhs)

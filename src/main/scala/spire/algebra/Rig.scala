@@ -23,7 +23,7 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] with Multipl
     else _pow(times(a, a), n / 2, sofar)
 }
 
-final class RigOps[A](lhs:A)(implicit ev:Rig[A]) {
+final class RigOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Rig[A]) {
   def pow(rhs:Int) = ev.pow(lhs, rhs)
   def **(rhs:Int) = ev.pow(lhs, rhs)
 }

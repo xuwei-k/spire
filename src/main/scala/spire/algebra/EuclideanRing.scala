@@ -22,14 +22,14 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
     if (b == zero) a else euclid(b, mod(a, b))
 }
 
-final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
+final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def /~(rhs:A) = ev.quot(lhs, rhs)
   def %(rhs:A) = ev.mod(lhs, rhs)
   def /%(rhs:A) = ev.quotmod(lhs, rhs)
 
-  def /~(rhs:Int): A = ev.quot(lhs, ev.fromInt(rhs))
-  def %(rhs:Int): A = ev.mod(lhs, ev.fromInt(rhs))
-  def /%(rhs:Int): (A, A) = ev.quotmod(lhs, ev.fromInt(rhs))
+  def /~(rhs:Int)(implicit c: Ring[A]): A = ev.quot(lhs, c.fromInt(rhs))
+  def %(rhs:Int)(implicit c: Ring[A]): A = ev.mod(lhs, c.fromInt(rhs))
+  def /%(rhs:Int)(implicit c: Ring[A]): (A, A) = ev.quotmod(lhs, c.fromInt(rhs))
 
   def /~(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.quot(lhs, c.fromDouble(rhs))
   def %(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.mod(lhs, c.fromDouble(rhs))

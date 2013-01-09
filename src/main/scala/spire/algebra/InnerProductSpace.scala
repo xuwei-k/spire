@@ -57,7 +57,7 @@ object InnerProductSpace {
   }
 }
 
-final class InnerProductSpaceOps[V](lhs: V) {
+final class InnerProductSpaceOps[@spec(Int,Long,Float,Double) V](lhs: V) {
   def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F = ev.dot(lhs, rhs)
   def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F = ev.dot(lhs, rhs)
 }

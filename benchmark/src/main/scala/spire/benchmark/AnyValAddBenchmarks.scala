@@ -40,6 +40,15 @@ class AnyValAddBenchmarks extends MyBenchmark {
     var total = Ring[A].zero
     var i = 0
     val len = data.length
+    val ev = Ring[A]
+    while (i < len) { total = ev.plus(total, data(i)); i += 1 }
+    total
+  }
+
+  def addGenericInfix[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+    var total = Ring[A].zero
+    var i = 0
+    val len = data.length
     while (i < len) { total += data(i); i += 1 }
     total
   }
@@ -94,14 +103,20 @@ class AnyValAddBenchmarks extends MyBenchmark {
 
   //def timeAddBytesDirect(reps:Int) = run(reps)(addBytesDirect(bytes))
   //def timeAddBytesGeneric(reps:Int) = run(reps)(addGeneric(bytes))
+  //def timeAddBytesGenericInfix(reps:Int) = run(reps)(addGenericInfix(bytes))
   //def timeAddShortsDirect(reps:Int) = run(reps)(addShortsDirect(shorts))
   //def timeAddShortsGeneric(reps:Int) = run(reps)(addGeneric(shorts))
+  //def timeAddShortsGenericInfix(reps:Int) = run(reps)(addGenericInfix(shorts))
   def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
   def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
+  def timeAddIntsGenericInfix(reps:Int) = run(reps)(addGenericInfix(ints))
   //def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
   //def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
+  //def timeAddLongsGenericInfix(reps:Int) = run(reps)(addGenericInfix(longs))
   //def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
   //def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  //def timeAddFloatsGenericInfix(reps:Int) = run(reps)(addGenericInfix(floats))
   //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  //def timeAddDoublesGenericInfix(reps:Int) = run(reps)(addGenericInfix(doubles))
 }

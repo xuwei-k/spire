@@ -14,7 +14,7 @@ class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
   def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(x))
 }
 
-final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
+final class EqOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = ev.eqv(lhs, rhs)
   def =!=(rhs:A) = ev.neqv(lhs, rhs)
 }

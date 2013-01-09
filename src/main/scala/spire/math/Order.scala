@@ -30,7 +30,7 @@ class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
   def compare(x: A, y: A) = order.compare(y, x)
 }
 
-final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+final class OrderOps[@spec(Int,Long,Float,Double) A](lhs: A)(implicit ev: Order[A]) {
   def >(rhs: A) = ev.gt(lhs, rhs)
   def >=(rhs: A) = ev.gteqv(lhs, rhs)
   def <(rhs: A) = ev.lt(lhs, rhs)

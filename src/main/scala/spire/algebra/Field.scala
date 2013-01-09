@@ -12,7 +12,7 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with Multip
   def isWhole(a:A): Boolean
 }
 
-final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
+final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
   def isWhole() = ev.isWhole(lhs)
   def ceil() = ev.ceil(lhs)
   def floor() = ev.floor(lhs)

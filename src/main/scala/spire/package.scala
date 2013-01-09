@@ -303,41 +303,30 @@ final class ConversionOps[A](a: A) {
   def widen[B](implicit rhs: WideningConversion[A, B]): B = rhs.widen(a)
 }
 
-trait LowViz {
-  //// these are lower priority to prevent conflicts around operators overloaded
-  //// to deal with literals
-  //implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
-  //implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
-  //implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
-  //implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
-}
+object implicits {
 
-object implicits extends LowViz {
+  implicit def additiveMonoidOps[@spec(Int,Long,Float,Double) A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
+  implicit def additiveGroupOps[@spec(Int,Long,Float,Double) A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
+  implicit def multiplicativeSemigroupOps[@spec(Int,Long,Float,Double) A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
+  implicit def multiplicativeGroupOps[@spec(Int,Long,Float,Double) A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
 
-  implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
-  implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
-  implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
-  implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
+  implicit def eqOps[@spec(Int,Long,Float,Double) A:Eq](a:A) = new EqOps(a)
+  implicit def orderOps[@spec(Int,Long,Float,Double) A:Order](a:A) = new OrderOps(a)
+  implicit def semigroupOps[@spec(Int,Long,Float,Double) A:Semigroup](a:A) = new SemigroupOps(a)
+  implicit def groupOps[@spec(Int,Long,Float,Double) A:Group](a:A) = new GroupOps(a)
 
-  implicit def eqOps[A:Eq](a:A) = new EqOps(a)
-  implicit def orderOps[A:Order](a:A) = new OrderOps(a)
-  implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
-  implicit def groupOps[A:Group](a:A) = new GroupOps(a)
+  implicit def convertableOps[@spec(Int,Long,Float,Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
-  implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
+  implicit def rigOps[@spec(Int,Long,Float,Double) A:Rig](a:A) = new RigOps(a)
+  implicit def euclideanRingOps[@spec(Int,Long,Float,Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
+  implicit def fieldOps[@spec(Int,Long,Float,Double) A:Field](a:A) = new FieldOps(a)
 
-  implicit def rigOps[A:Rig](a:A) = new RigOps(a)
-  implicit def euclideanRingOps[A:EuclideanRing](a:A) = new EuclideanRingOps(a)
-  implicit def fieldOps[A:Field](a:A) = new FieldOps(a)
+  implicit def signedOps[@spec(Int,Long,Float,Double) A: Signed](a: A) = new SignedOps(a)
+  implicit def nrootOps[@spec(Int,Long,Float,Double) A: NRoot](a: A) = new NRootOps(a)
 
-  implicit def integralOps[A:Integral](a:A) = new IntegralOps(a)
-
-  implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
-  implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
-
-  implicit def moduleOps[V, R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
-  implicit def rigtModuleOps[V, R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
-  implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
+  implicit def moduleOps[V, @spec(Int,Long,Float,Double) R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
+  implicit def rigtModuleOps[V, @spec(Int,Long,Float,Double) R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
+  implicit def vectorSpaceOps[V, @spec(Int,Long,Float,Double) F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
 
@@ -351,7 +340,7 @@ object implicits extends LowViz {
 
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
 
-  implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
+  implicit def booleanAlgebraOps[@spec A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
 
 // object syntax {

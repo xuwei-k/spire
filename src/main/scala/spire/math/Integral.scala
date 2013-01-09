@@ -12,13 +12,6 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def isNegative(x: A) = lt(x, zero)
 }
 
-class IntegralOps[A](lhs:A)(implicit ev:Integral[A]) {
-  def isZero() = ev.isZero(lhs)
-  def isNonzero() = ev.isNonzero(lhs)
-  def isPositive() = ev.isPositive(lhs)
-  def isNegative() = ev.isNegative(lhs)
-}
-
 object Integral {
   implicit object IntIsIntegral extends IntIsIntegral
   implicit object LongIsIntegral extends LongIsIntegral

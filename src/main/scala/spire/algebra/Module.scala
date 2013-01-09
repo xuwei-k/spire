@@ -69,11 +69,11 @@ trait Module1 extends Module0 {
 
 object Module extends Module1
 
-final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
+final class ModuleOps[V, @spec(Int,Long,Float,Double) F](rhs: V)(implicit ev: Module[V, F]) {
   def *: (lhs:F): V = ev.timesl(lhs, rhs)
 }
 
-final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
+final class RightModuleOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: RightModule[V, F]) {
   def :* (rhs:F): V = ev.timesr(lhs, rhs)
 }
 

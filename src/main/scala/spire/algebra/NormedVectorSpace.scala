@@ -18,6 +18,6 @@ trait NormedVectorSpace0 {
 object NormedVectorSpace extends NormedVectorSpace0
 
 final class NormedVectorSpaceOps[V](lhs: V) {
-  def norm[F](implicit ev: NormedVectorSpace[V, F]): F = ev.norm(lhs)
-  def normalize[F](implicit ev: NormedVectorSpace[V, F]): V = ev.normalize(lhs)
+  def norm[@spec(Int,Long,Float,Double) F](implicit ev: NormedVectorSpace[V, F]): F = ev.norm(lhs)
+  def normalize[@spec(Int,Long,Float,Double) F](implicit ev: NormedVectorSpace[V, F]): V = ev.normalize(lhs)
 }

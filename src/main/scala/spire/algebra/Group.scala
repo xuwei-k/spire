@@ -1,9 +1,11 @@
 package spire.algebra
 
+import scala.{specialized => spec}
+
 /**
  * A group is a monoid where each element has an inverse.
  */
-trait Group[A] extends Monoid[A] {
+trait Group[@spec(Int,Long,Float,Double) A] extends Monoid[A] {
   def inverse(a: A): A
 }
 
@@ -16,6 +18,6 @@ object Group {
  */
 trait AbGroup[A] extends Group[A]
 
-final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
+final class GroupOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Group[A]) {
   def inverse() = ev.inverse(lhs)
 }

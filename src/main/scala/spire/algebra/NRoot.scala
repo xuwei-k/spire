@@ -29,7 +29,7 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
-final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
+final class NRootOps[@spec(Int,Long,Float,Double) A](lhs: A)(implicit ev: NRoot[A]) {
   def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
   def sqrt(): A = ev.sqrt(lhs)
   def log(): A = ev.log(lhs)

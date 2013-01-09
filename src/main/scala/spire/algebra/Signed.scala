@@ -47,13 +47,13 @@ object Signed extends SignedLow {
   def apply[A](implicit s: Signed[A]): Signed[A] = s
 }
 
-final class SignedOps[A](lhs: A)(implicit ev: Signed[A]) {
+final class SignedOps[@spec(Int,Long,Float,Double) A](lhs: A)(implicit ev: Signed[A]) {
   def abs(): A = ev.abs(lhs)
   def sign(): Sign = ev.sign(lhs)
   def signum(): Int = ev.signum(lhs)
 }
 
-class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {
+class OrderedRingIsSigned[@spec(Int,Long,Float,Double) A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {
   def signum(a:A) = o.compare(a, r.zero)
   def abs(a:A) = if (signum(a) < 0) r.negate(a) else a
 }

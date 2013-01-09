@@ -513,7 +513,7 @@ object ConvertableFrom {
     }
 }
 
-final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
+final class ConvertableFromOps[@spec A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   override def toString(): String = ev.toString(lhs)
   def toByte(): Byte = ev.toByte(lhs)
   def toShort(): Short = ev.toShort(lhs)

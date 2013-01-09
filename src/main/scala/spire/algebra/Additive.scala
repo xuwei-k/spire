@@ -43,14 +43,14 @@ object AdditiveMonoid extends AdditiveMonoid0 {
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
-final class AdditiveMonoidOps[A](lhs:A)(implicit ev:AdditiveMonoid[A]) {
+final class AdditiveMonoidOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:AdditiveMonoid[A]) {
   def +(rhs:A): A = ev.plus(lhs, rhs)
   def +(rhs:Int)(implicit c: Ring[A]): A = ev.plus(lhs, c.fromInt(rhs))
   def +(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.plus(lhs, c.fromDouble(rhs))
   def +(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
 }
 
-final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
+final class AdditiveGroupOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:AdditiveGroup[A]) {
   def unary_-() = ev.negate(lhs)
   def -(rhs:A): A = ev.minus(lhs, rhs)
   def -(rhs:Int)(implicit c: Ring[A]): A = ev.minus(lhs, c.fromInt(rhs))
