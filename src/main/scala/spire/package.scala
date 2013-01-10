@@ -315,8 +315,7 @@ object implicits {
   implicit def semigroupOps[@spec(Int,Long,Float,Double) A:Semigroup](a:A) = new SemigroupOps(a)
   implicit def groupOps[@spec(Int,Long,Float,Double) A:Group](a:A) = new GroupOps(a)
 
-  implicit def convertableOps[@spec(Int,Long,Float,Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
-
+  implicit def booleanAlgebraOps[@spec(Int,Long) A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
   implicit def rigOps[@spec(Int,Long,Float,Double) A:Rig](a:A) = new RigOps(a)
   implicit def euclideanRingOps[@spec(Int,Long,Float,Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[@spec(Int,Long,Float,Double) A:Field](a:A) = new FieldOps(a)
@@ -337,7 +336,7 @@ object implicits {
   //implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
-
+  implicit def convertableOps[@spec A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
 
   implicit def booleanAlgebraOps[@spec A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
@@ -483,4 +482,37 @@ object fun {
   @inline final def max(x: Double, y: Double): Double = Math.max(x, y)
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
 }
+
+package optional {
+  object totalfloat {
+    trait TotalFloatEq extends Eq[Float] {
+      def eqv(x:Float, y:Float) = java.lang.Float.compare(x, y) == 0
+      override def neqv(x:Float, y:Float) = java.lang.Float.compare(x, y) != 0
+    }
+    trait TotalFloatOrder extends Order[Float] with TotalFloatEq {
+      override def gt(x: Float, y: Float) = java.lang.Float.compare(x, y) > 0
+      override def gteqv(x: Float, y: Float) = java.lang.Float.compare(x, y) >= 0
+      override def lt(x: Float, y: Float) = java.lang.Float.compare(x, y) > 0
+      override def lteqv(x: Float, y: Float) = java.lang.Float.compare(x, y) >= 0
+      override def min(x: Float, y: Float) = if (java.lang.Float.compare(x, y) < 0) x else y
+      override def max(x: Float, y: Float) = Math.max(x, y)
+      def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
+    }
+    implicit object TotalFloatOrder extends TotalFloatOrder
+  
+    trait TotalDoubleEq extends Eq[Double] {
+      def eqv(x:Double, y:Double) = java.lang.Double.compare(x, y) == 0
+      override def neqv(x:Double, y:Double) = java.lang.Double.compare(x, y) != 0
+    }
+    trait TotalDoubleOrder extends Order[Double] with TotalDoubleEq {
+      override def gt(x: Double, y: Double) = java.lang.Double.compare(x, y) > 0
+      override def gteqv(x: Double, y: Double) = java.lang.Double.compare(x, y) >= 0
+      override def lt(x: Double, y: Double) = java.lang.Double.compare(x, y) > 0
+      override def lteqv(x: Double, y: Double) = java.lang.Double.compare(x, y) >= 0
+      override def min(x: Double, y: Double) = if (java.lang.Double.compare(x, y) < 0) x else y
+      override def max(x: Double, y: Double) = Math.max(x, y)
+      def compare(x: Double, y: Double) = java.lang.Double.compare(x, y)
+    }
+    implicit object TotalDoubleOrder extends TotalDoubleOrder
+  }
 }
