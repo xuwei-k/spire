@@ -305,7 +305,7 @@ final class ConversionOps[A](a: A) {
 
 object implicits {
 
-  implicit def additiveMonoidOps[@spec(Int,Long,Float,Double) A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
+  implicit def additiveSemigroupOps[@spec(Int,Long,Float,Double) A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
   implicit def additiveGroupOps[@spec(Int,Long,Float,Double) A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
   implicit def multiplicativeSemigroupOps[@spec(Int,Long,Float,Double) A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
   implicit def multiplicativeGroupOps[@spec(Int,Long,Float,Double) A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
@@ -316,7 +316,7 @@ object implicits {
   implicit def groupOps[@spec(Int,Long,Float,Double) A:Group](a:A) = new GroupOps(a)
 
   implicit def booleanAlgebraOps[@spec(Int,Long) A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
-  implicit def rigOps[@spec(Int,Long,Float,Double) A:Rig](a:A) = new RigOps(a)
+  implicit def semiringOps[@spec(Int,Long,Float,Double) A:Rig](a:A) = new SemiringOps(a)
   implicit def euclideanRingOps[@spec(Int,Long,Float,Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[@spec(Int,Long,Float,Double) A:Field](a:A) = new FieldOps(a)
 

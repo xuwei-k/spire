@@ -12,8 +12,8 @@ import spire.math._
  * Rig is a ring whose additive structure doesn't have an inverse (ie. it is
  * monoid, not a group). Put another way, a Rig is a Ring without a negative.
  */
-trait Rig[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] with MultiplicativeMonoid[A] {
-  def pow(a:A, n:Int):A =
+trait Rig[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveMonoid[A] with MultiplicativeMonoid[A] {
+  override def pow(a:A, n:Int):A =
     if (n < 0) sys.error("illegal exponent: %s" format n)
     else _pow(a, n, one)
 
@@ -21,11 +21,6 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] with Multipl
     if (n == 0) sofar
     else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
     else _pow(times(a, a), n / 2, sofar)
-}
-
-final class RigOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Rig[A]) {
-  def pow(rhs:Int) = ev.pow(lhs, rhs)
-  def **(rhs:Int) = ev.pow(lhs, rhs)
 }
 
 object Rig {

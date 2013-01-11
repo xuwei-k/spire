@@ -48,6 +48,7 @@ final class MultiplicativeSemigroupOps[@spec(Int,Long,Float,Double) A](lhs:A)(im
 }
 
 final class MultiplicativeGroupOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
+  def reciprocal() = ev.reciprocal(lhs)
   def /(rhs:A): A = ev.div(lhs, rhs)
   def /(rhs:Int)(implicit c: Ring[A]): A = ev.div(lhs, c.fromInt(rhs))
   def /(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.div(lhs, c.fromDouble(rhs))
