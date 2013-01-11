@@ -2,6 +2,8 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
+import scala.{ specialized => spec }
+
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
