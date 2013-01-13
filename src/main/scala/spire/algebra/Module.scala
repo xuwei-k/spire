@@ -26,7 +26,7 @@ trait RightModule[V, @spec(Int,Long,Float,Double) R] extends AdditiveGroup[V] {
   def timesr(v: V, r: R): V
 }
 
-object Module extends Module3
+object Module extends Module2
 
 final class ModuleOps[V, @spec(Int,Long,Float,Double) F](rhs: V)(implicit ev: Module[V, F]) {
   def *: (lhs:F): V = ev.timesl(lhs, rhs)
@@ -37,23 +37,19 @@ final class RightModuleOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit e
 }
 
 trait Module0 {
-  implicit def seqModule[A: Ring]: Module[Seq[A], A] = SeqModule[A, Seq[A]]
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
+      ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqModule[A, CC[A]] {
+    val scalar = ring0
+    val cbf = cbf0
+  }
 }
 
 trait Module1 extends Module0 {
-  implicit def IndexedSeqModule[A: Ring]: Module[IndexedSeq[A], A] = SeqModule[A, IndexedSeq[A]]
-}
-
-trait Module2 extends Module1 {
   implicit def IdentityModule[@spec(Int,Long,Float,Double) V](implicit ring: Ring[V]) = {
     new IdentityModule[V] {
       val scalar = ring
     }
   }
-
-  implicit def ListModule[A: Ring]: Module[List[A], A] = SeqModule[A, List[A]]
-
-  implicit def VectorModule[A: Ring]: Module[Vector[A], A] = SeqModule[A, Vector[A]]
 
   implicit def ArrayModule[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Ring[A], classTag0: ClassTag[A]): Module[Array[A], A] = new ArrayModule[A] {
@@ -95,7 +91,7 @@ trait Module2 extends Module1 {
   }
 }
 
-trait Module3 extends Module2 {
+trait Module2 extends Module1 {
   implicit def VectorSpaceIsModule[V,@spec(Int,Long,Float,Double) R](implicit
     vs: VectorSpace[V, R]): Module[V, R] = vs
 }
@@ -215,15 +211,6 @@ trait SeqModule[A, SA <: SeqLike[A, SA]] extends Module[SA, A] {
   }
 
   def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
-}
-
-object SeqModule {
-  def apply[A, SA <: SeqLike[A, SA]](implicit A: Ring[A], cbf0: CanBuildFrom[SA, A, SA]) = {
-    new SeqModule[A, SA] {
-      val scalar = A
-      val cbf = cbf0
-    }
-  }
 }
 
 trait Tuple2IsModule[@spec(Int,Long,Float,Double) A]

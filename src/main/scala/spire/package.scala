@@ -303,6 +303,17 @@ final class ConversionOps[A](a: A) {
   def widen[B](implicit rhs: WideningConversion[A, B]): B = rhs.widen(a)
 }
 
+/**
+ * `NoImplicit` provides a way to ensure that a particular implicit doesn't
+ * exist. It is often useful to work-around annoying ambiguous implicit
+ * problems.
+ */
+final class NoImplicit[A]
+object NoImplicit {
+  implicit def noImplicit0[A] = new NoImplicit[A]
+  implicit def noImplicit1[A](implicit ev: A) = new NoImplicit[A]
+}
+
 object implicits {
 
   implicit def additiveSemigroupOps[@spec(Int,Long,Float,Double) A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
@@ -339,7 +350,6 @@ object implicits {
   implicit def convertableOps[@spec A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
 
-  implicit def booleanAlgebraOps[@spec A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
 
 // object syntax {
