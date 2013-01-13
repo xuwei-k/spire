@@ -3,7 +3,6 @@ package spire.algebra
 import spire.NoImplicit
 
 import scala.{ specialized => spec }
-import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
@@ -41,7 +40,5 @@ trait VectorSpace2 extends VectorSpace1 {
 final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: VectorSpace[V, F]) {
   def :/ (rhs:F): V = ev.divr(lhs, rhs)
 }
-
-trait SeqVectorSpace[A, SA <: SeqLike[A, SA]] extends SeqModule[A, SA] with VectorSpace[SA, A]
 
 trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] with VectorSpace[Array[A], A]
