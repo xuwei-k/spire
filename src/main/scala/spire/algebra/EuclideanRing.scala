@@ -41,7 +41,7 @@ final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:
   def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
 }
 
-object EuclideanRing {
+object EuclideanRing extends EuclideanRingProductImplicits {
   implicit object IntIsEuclideanRing extends IntIsEuclideanRing
   implicit object LongIsEuclideanRing extends LongIsEuclideanRing
   implicit object FloatIsEuclideanRing extends FloatIsEuclideanRing

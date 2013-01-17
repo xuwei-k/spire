@@ -19,7 +19,7 @@ final class EqOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Eq[A]) {
   def =!=(rhs:A) = ev.neqv(lhs, rhs)
 }
 
-object Eq extends LowPriority {
+object Eq extends Eq1 with EqProductImplicits {
   implicit object ByteEq extends ByteEq
   implicit object ShortEq extends ShortEq
   implicit object CharEq extends CharEq
@@ -46,9 +46,11 @@ object Eq extends LowPriority {
   def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new MappedEq(e)(f)
 }
 
-trait LowPriority {
+trait Eq0 {
   implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
 }
+
+trait Eq1 extends Eq0
 
 private[this] class GenericEq[@spec A] extends Eq[A] {
   def eqv(x:A, y:A): Boolean = x == y

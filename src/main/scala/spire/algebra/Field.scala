@@ -19,7 +19,7 @@ final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]
   def round() = ev.round(lhs)
 }
 
-object Field {
+object Field extends FieldProductImplicits {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField
