@@ -19,7 +19,7 @@ final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]
   def round() = ev.round(lhs)
 }
 
-object Field extends FieldProductImplicits {
+object Field extends Field0 with FieldProductImplicits {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField
@@ -33,6 +33,11 @@ object Field extends FieldProductImplicits {
   implicit object NumberIsField extends NumberIsField
 
   @inline final def apply[A](implicit f:Field[A]):Field[A] = f
+}
+
+trait Field0 {
+  implicit def vectorSpaceScalar[V, @spec(Float,Double) F](implicit
+      vectorSpace: VectorSpace[V, F]): Field[F] = vectorSpace.scalar
 }
 
 trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
