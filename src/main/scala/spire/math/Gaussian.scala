@@ -7,7 +7,6 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-//import spire.math.fun._
 import spire.implicits._
 
 object Gaussian {
@@ -26,10 +25,15 @@ object Gaussian {
   implicit def intToGaussian(n:Int) = new Gaussian[Int](n, 0)
   implicit def longToGaussian(n:Long) = new Gaussian[Long](n, 0L)
   implicit def bigIntToGaussian(n:BigInt) = new Gaussian[BigInt](n, BigInt(0))
+
+  def apply[@spec(Int, Long) T](real: T)(implicit f: Integral[T]): Gaussian[T] =
+    new Gaussian(real, f.zero)
 }
 
 final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Integral[T])
     extends ScalaNumber with ScalaNumericConversions {
+
+  override def toString(): String = "(%s+%si)" format (real, imag)
 
   def doubleValue: Double = f.toDouble(real)
   def floatValue: Float = f.toFloat(real)
@@ -49,8 +53,6 @@ final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Inte
     case that: Gaussian[_] => real == that.real && imag == that.imag
     case that => unifiedPrimitiveEquals(that)
   }
-
-  override def toString: String = "Gaussian(%s, %s)".format(real, imag)
 
   def norm: T = f.plus(f.times(real, real), f.times(imag, imag))
   def conjugate: Gaussian[T] = new Gaussian(real, f.negate(imag))
@@ -88,18 +90,9 @@ final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Inte
     new Gaussian(r, j)
   }
 
-  def quot(b: Gaussian[T]): Gaussian[T] = this / b
-
   def /~(b: Gaussian[T]): Gaussian[T] = this / b
 
-  def %(b: Gaussian[T]): Gaussian[T] = {
-    val n = b.norm
-    val r = f.quot(f.plus(f.times(real, b.real), f.times(imag, b.imag)), n)
-    val j = f.quot(f.minus(f.times(imag, b.real), f.times(real, b.imag)), n)
-    val rr = f.minus(f.times(r, b.real), f.times(j, b.imag))
-    val jj = f.plus(f.times(j, b.real), f.times(r, b.imag))
-    new Gaussian(f.minus(real, rr), f.minus(imag, jj))
-  }
+  def %(b: Gaussian[T]): Gaussian[T] = this - (this / b) * b
 
   def /%(b: Gaussian[T]): (Gaussian[T], Gaussian[T]) = {
     val q = this / b
@@ -114,8 +107,8 @@ final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Inte
     @tailrec
     def recur(g: Gaussian[T], n: Int, sofar: Gaussian[T]): Gaussian[T] =
       if (n == 0) sofar
-      else if ((n & 1) == 1) recur(g * g, n / 2, g * sofar)
-      else recur(g * g, n / 2, sofar)
+      else if ((n & 1) == 1) recur(g * g, n >> 1, g * sofar)
+      else recur(g * g, n >> 1, sofar)
 
     recur(this, n, Gaussian.one[T])
   }
