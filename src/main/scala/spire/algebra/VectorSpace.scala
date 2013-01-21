@@ -48,5 +48,3 @@ trait VectorSpace2 extends VectorSpace1 {
 final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: VectorSpace[V, F]) {
   def :/ (rhs:F): V = ev.divr(lhs, rhs)
 }
-
-trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] with VectorSpace[Array[A], A]
