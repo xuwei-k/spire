@@ -164,7 +164,7 @@ trait SafeLongIsNRoot extends NRoot[SafeLong] {
     SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
 }
 
-object NRoot extends NRoot0 {
+object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
 
   implicit object IntIsNRoot extends IntIsNRoot
@@ -297,11 +297,6 @@ object NRoot extends NRoot0 {
     val newscale = (size - (intPart.size + k - 1) / k) * 9
     BigDecimal(unscaled, newscale, ctxt)
   }
-}
-
-trait NRoot0 {
-  implicit def innerProductSpaceNRoot[V, @spec(Float,Double) F](implicit
-      ips: InnerProductSpace[V, F]): NRoot[F] = ips.nroot
 }
 
 trait NumberIsNRoot extends NRoot[Number] {
