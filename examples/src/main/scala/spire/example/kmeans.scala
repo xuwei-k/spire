@@ -3,10 +3,8 @@ package spire.example
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-import spire.syntax._
 
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 import scala.{ specialized => spec }
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 import scala.annotation.tailrec
@@ -25,7 +23,7 @@ object KMeansExample extends App {
    */
   def kMeans[V, @spec(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
       vs: NormedVectorSpace[V, A], order: Order[A],
-      cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
+      cbf: CanBuildFrom[Nothing, V, CC[V]], ct: Manifest[V]): CC[V] = {
 
     val points = points0.toArray
 
@@ -34,17 +32,21 @@ object KMeansExample extends App {
 
     def assign(clusters: Array[V]): Array[Int] = {
       val assignments = new Array[Int](points.length)
-      cfor(0)(_ < points.length, _ + 1) { i =>
+      var i = 0
+      while (i < points.length) {
         var min = (points(i) - clusters(0)).norm
         var idx = 0
-        cfor(1)(_ < clusters.length, _ + 1) { j =>
+        var j = 1
+        while (j < clusters.length) {
           val dist = (points(i) - clusters(j)).norm
           if (dist < min) {
             min = dist
             idx = j
           }
+          j += 1
         }
         assignments(i) = idx
+        i += 1
       }
       assignments
     }
@@ -64,13 +66,17 @@ object KMeansExample extends App {
       } else {
         val clusters = Array.fill[V](clusters0.length)(vs.zero)
         val counts = new Array[Int](clusters0.length)
-        cfor(0)(_ < points.length, _ + 1) { i =>
+        var i = 0
+        while (i < points.length) {
           val idx = assignments(i)
           clusters(idx) = clusters(idx) + points(i)
           counts(idx) += 1
+          i += 1
         }
-        cfor(0)(_ < clusters.length, _ + 1) { j =>
+        var j = 0
+        while (j < clusters.length) {
           clusters(j) = clusters(j) :/ vs.scalar.fromInt(counts(j))
+          j += 1
         }
         loop(assignments, clusters)
       }
@@ -86,8 +92,10 @@ object KMeansExample extends App {
     // wants before we return the clusters.
 
     val bldr = cbf()
-    cfor(0)(_ < clusters.length, _ + 1) { i =>
+    var i = 0
+    while (i < clusters.length) {
       bldr += clusters(i)
+      i += 1
     }
     bldr.result()
   }
@@ -105,8 +113,10 @@ object KMeansExample extends App {
     })(collection.breakOut)
 
     val bldr = cbf()
-    cfor(0)(_ < n, _ + 1) { _ =>
+    var i = 0
+    while (i < n) {
       bldr += centers(nextInt(k)) + randPoint(nextGaussian)
+      i += 1
     }
     bldr.result()
   }
@@ -117,8 +127,8 @@ object KMeansExample extends App {
   // cluster each one, using the same k-means algorithm.
 
   val points0 = genPoints[List, Array[Double], Double](15, 5, 10000)(identity)
-  val points1 = genPoints[List, Vector[Double], Double](5, 10, 10000)(_.toVector)
-  val points2 = genPoints[List, Vector[BigDecimal], BigDecimal](7, 8, 2000)(_.map(BigDecimal(_)).toVector)
+  val points1 = genPoints[List, Vector[Double], Double](5, 10, 10000)(Vector.empty[Double] ++ _)
+  val points2 = genPoints[List, Vector[BigDecimal], BigDecimal](7, 8, 2000)(Vector.empty[BigDecimal] ++ _.map(BigDecimal(_)))
 
   println("Finding clusters of Array[Double] points.")
   val cluster0 = kMeans(points0, 5)

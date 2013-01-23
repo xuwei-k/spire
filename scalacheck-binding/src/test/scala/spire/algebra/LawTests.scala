@@ -42,20 +42,20 @@ class LawTests extends LawChecker {
   // iterators and CanBuildFroms. So, presuming the Scala std lib is tested,
   // testing just List and Vector should suffice for us.
 
-  checkAll("List is Module", VectorSpaceLaws[List[Int], Int].module)
-  checkAll("Vector is Module", VectorSpaceLaws[Vector[Int], Int].module)
-  checkAll("List is VectorSpace", VectorSpaceLaws[List[Rational], Rational].vectorSpace)
-  checkAll("Vector is VectorSpcae", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
-  
-  checkAll("Array is Module", VectorSpaceLaws[Array[Int], Int].module)
-  checkAll("Array is VectorSpace", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
-
-  checkAll("Map is Module", VectorSpaceLaws[Map[String,Int], Int].module)
-  checkAll("Map is VectorSpace", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
-
-  val max = NormedVectorSpace.max[Rational, List]
-  checkAll("L_inf NormedVectorSpace",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+  //checkAll("List is Module", VectorSpaceLaws[List[Int], Int].module)
+  //checkAll("Vector is Module", VectorSpaceLaws[Vector[Int], Int].module)
+  //checkAll("List is VectorSpace", VectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  //checkAll("Vector is VectorSpcae", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+  //
+  //checkAll("Array is Module", VectorSpaceLaws[Array[Int], Int].module)
+  //checkAll("Array is VectorSpace", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
+  //
+  //checkAll("Map is Module", VectorSpaceLaws[Map[String,Int], Int].module)
+  //checkAll("Map is VectorSpace", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
+  //
+  //val max = NormedVectorSpace.max[Rational, List]
+  //checkAll("L_inf NormedVectorSpace",
+  //  VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
 
   checkAll("List is a Monoid", Laws[List[Int]].monoid)
   checkAll("Vector is a Monoid", Laws[Vector[Int]].monoid)
