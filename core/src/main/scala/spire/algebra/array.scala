@@ -1,10 +1,9 @@
 package spire.algebra
 
 import scala.{ specialized => spec }
-import scala.reflect.ClassTag
 
 trait ArrayModule[@spec(Int,Long,Float,Double) A] extends Module[Array[A], A] {
-  implicit def classTag: ClassTag[A]
+  implicit def classTag: Manifest[A]
 
   def zero: Array[A] = new Array[A](0)
 

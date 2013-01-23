@@ -5,7 +5,6 @@ import spire.NoImplicit
 import scala.{ specialized => spec }
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form
@@ -65,7 +64,7 @@ trait Module1 extends Module0 {
   }
 
   implicit def ArrayModule[@spec(Int,Long,Float,Double) A](implicit
-      ev: NoImplicit[VectorSpace[Array[A], A]], classTag0: ClassTag[A],
+      ev: NoImplicit[VectorSpace[Array[A], A]], classTag0: Manifest[A],
       scalar0: Ring[A]): Module[Array[A], A] = new ArrayModule[A] {
     val scalar = scalar0
     val classTag = classTag0

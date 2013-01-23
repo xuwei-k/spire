@@ -21,7 +21,7 @@ object MyBuild extends Build {
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      scalaTest % "test",
+      scalaTest % "test"
     ),
 
     scalacOptions ++= Seq(

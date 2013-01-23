@@ -5,7 +5,6 @@ import spire.NoImplicit
 import scala.{ specialized => spec }
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
   implicit def scalar: Field[F]
@@ -33,7 +32,7 @@ trait VectorSpace0 {
 
 trait VectorSpace1 extends VectorSpace0 {
   implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A](implicit
-      ev: NoImplicit[NormedVectorSpace[Array[A], A]], classTag0: ClassTag[A],
+      ev: NoImplicit[NormedVectorSpace[Array[A], A]], classTag0: Manifest[A],
       scalar0: Field[A]): VectorSpace[Array[A], A] = new ArrayVectorSpace[A] {
     val scalar = scalar0
     val classTag = classTag0

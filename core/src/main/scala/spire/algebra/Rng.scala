@@ -6,7 +6,6 @@ import scala.{specialized => spec}
 import java.lang.Math
 
 import spire.math._
-import spire.macrosk.Ops
 
 /**
  * Rng is a ring whose multiplicative structure doesn't have an identity

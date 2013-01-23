@@ -4,7 +4,6 @@ import scala.{specialized => spec}
 
 import java.lang.Math
 import scala.collection.SeqLike
-import scala.reflect.ClassTag
 
 trait Order[@spec A] extends Eq[A] {
   self =>
@@ -110,7 +109,7 @@ trait Order0 {
 
 trait Order1 extends Order0 {
   implicit def array[@spec(Int,Long,Float,Double) A](implicit
-      A0: Order[A], ct: ClassTag[A]) = new ArrayOrder[A] {
+      A0: Order[A], ct: Manifest[A]) = new ArrayOrder[A] {
     val A = A0
     val classTag = ct
   }

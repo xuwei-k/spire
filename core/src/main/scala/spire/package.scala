@@ -105,7 +105,7 @@ final class LiteralDoubleOps(val lhs:Double) {
   def max[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.max(c.fromDouble(lhs), rhs)
 }
 
-class LiteralBigIntOps(val lhs:BigInt) extends AnyVal {
+class LiteralBigIntOps(val lhs:BigInt) {
   def +(rhs: SafeLong) = SafeLong(lhs) + rhs
   def *(rhs: SafeLong) = SafeLong(lhs) * rhs
   def -(rhs: SafeLong) = SafeLong(lhs) - rhs
@@ -543,14 +543,14 @@ package optional {
     }
 
     implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit
-        A0: Eq[A], module: Module[Array[A], A], ct: ClassTag[A]) = new ArrayVectorEq[A] {
+        A0: Eq[A], module: Module[Array[A], A], ct: Manifest[A]) = new ArrayVectorEq[A] {
       val scalar = module.scalar
       val A = A0
       val classTag = ct
     }
 
     implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit
-        A0: Order[A], module: Module[Array[A], A], ct: ClassTag[A]) = new ArrayVectorOrder[A] {
+        A0: Order[A], module: Module[Array[A], A], ct: Manifest[A]) = new ArrayVectorOrder[A] {
       val scalar = module.scalar
       val A = A0
       val classTag = ct
@@ -600,4 +600,5 @@ package optional {
     }
     implicit object TotalDoubleOrder extends TotalDoubleOrder
   }
+}
 }

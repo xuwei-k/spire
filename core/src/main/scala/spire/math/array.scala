@@ -2,12 +2,11 @@ package spire.math
 
 import spire.algebra.{ AdditiveMonoid }
 
-import scala.reflect.ClassTag
 import scala.{ specialized => spec }
 
 trait ArrayEq[@spec(Int,Long,Float,Double) A] extends Eq[Array[A]] {
   implicit def A: Eq[A]
-  implicit def classTag: ClassTag[A]
+  implicit def classTag: Manifest[A]
 
   def eqv(x: Array[A], y: Array[A]): Boolean = {
     if (x.length != y.length) false else {

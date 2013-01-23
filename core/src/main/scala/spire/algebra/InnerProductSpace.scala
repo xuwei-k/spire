@@ -6,7 +6,6 @@ import scala.{ specialized => spec }
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVectorSpace[V, F] {
   implicit def nroot: NRoot[F]
@@ -41,7 +40,7 @@ trait InnerProductSpace0 {
 trait InnerProductSpace1 extends InnerProductSpace0 {
   implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], nroot0: NRoot[A],
-      classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
+      classTag0: Manifest[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
     val scalar = scalar0
     val nroot = nroot0
     val classTag = classTag0

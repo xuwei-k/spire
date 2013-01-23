@@ -207,7 +207,7 @@ object FloatComplex {
  * We get (basically) unboxed complex numbers using this hack.
  * The underlying implementation lives in the FastComplex object.
  */
-class FloatComplex(val u: Long) extends AnyVal {
+class FloatComplex(val u: Long) {
   override final def toString: String = "(%s+%si)" format (real, imag)
 
   final def real: Float = FastComplex.real(u)

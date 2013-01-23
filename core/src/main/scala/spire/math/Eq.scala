@@ -4,7 +4,6 @@ import scala.{specialized => spec}
 
 import spire.algebra.Zero
 import scala.collection.SeqLike
-import scala.reflect.ClassTag
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -70,7 +69,7 @@ trait Eq1 extends Eq0 {
 
 trait Eq2 extends Eq1 {
   implicit def array[@spec(Int,Long,Float,Double) A](implicit
-      A0: Eq[A], ct: ClassTag[A]) = new ArrayEq[A] {
+      A0: Eq[A], ct: Manifest[A]) = new ArrayEq[A] {
     val A = A0
     val classTag = ct
   }

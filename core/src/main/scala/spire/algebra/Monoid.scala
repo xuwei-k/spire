@@ -3,7 +3,6 @@ package spire.algebra
 import scala.{ specialized => spec }
 import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 /**
  * A monoid is a semigroup with a special identity element.
@@ -52,7 +51,7 @@ final class CollMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFr
   def op(x: SA, y: SA): SA = x.++(y)(cbf)
 }
 
-final class ArrayMonoid[@spec A: ClassTag] extends Monoid[Array[A]] {
+final class ArrayMonoid[@spec A: Manifest] extends Monoid[Array[A]] {
   def id = new Array[A](0)
   def op(x: Array[A], y: Array[A]) = {
     val z = new Array[A](x.length + y.length)

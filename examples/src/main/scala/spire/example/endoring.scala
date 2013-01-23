@@ -1,7 +1,5 @@
 package spire.example
 
-import language.implicitConversions
-
 import spire.algebra._
 import spire.implicits._
 import spire.math._

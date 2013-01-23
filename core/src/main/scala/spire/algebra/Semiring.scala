@@ -6,7 +6,6 @@ import scala.{specialized => spec}
 import java.lang.Math
 
 import spire.math._
-import spire.macrosk.Ops
 
 
 /**
@@ -30,8 +29,8 @@ trait Semiring[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] with
 }
 
 final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
-  def pow(rhs:Int) = macro Ops.binop[Int, A]
-  def **(rhs:Int) = macro Ops.binop[Int, A]
+  def pow(rhs:Int) = ev.pow(lhs, rhs)
+  def **(rhs:Int) = ev.pow(lhs, rhs)
 }
 
 trait Semiring0 extends SemiringProductImplicits {
