@@ -12,7 +12,7 @@ trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
   def divr(v: V, f: F): V = timesl(scalar.reciprocal(f), v)
 }
 
-object VectorSpace extends VectorSpace2 {
+object VectorSpace extends VectorSpace3 {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: VectorSpace[V, R]) = V
 }
 
@@ -44,6 +44,11 @@ trait VectorSpace2 extends VectorSpace1 {
     vectorSpace: NormedVectorSpace[V, F]): VectorSpace[V, F] = vectorSpace
 }
 
-final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: VectorSpace[V, F]) {
-  def :/ (rhs:F): V = ev.divr(lhs, rhs)
+trait VectorSpace3 extends VectorSpace2 {
+  implicit def InnerProductSpaceIsVectorSpace[V, @spec(Int, Long, Float, Double) F](implicit
+    vectorSpace: InnerProductSpace[V, F]): VectorSpace[V, F] = vectorSpace
+}
+
+final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](rhs: V)(implicit ev: VectorSpace[V, F]) {
+  def :/ (rhs:F): V = macro Ops.binop[F, V]
 }

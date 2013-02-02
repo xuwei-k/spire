@@ -4,11 +4,6 @@
 // after backporting tons of stuff from 2.10 to 2.9 i didn't have the
 // energy to figure this out. sorry.
 
-//package spire.algebra
-//
-//import spire.implicits._
-//import spire.math.{ Eq, Order }
-//
 //import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 //import org.scalacheck.Prop._
 //
@@ -72,7 +67,7 @@
 //  }
 //
 //  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = new Properties("inner-product space") {
-//    include(normedVectorSpace)
+//    include(vectorSpace)
 //
 //    property("symmetry") = forAll { (v: V, w: V) =>
 //      (v ⋅ w).abs === (w ⋅ v).abs
