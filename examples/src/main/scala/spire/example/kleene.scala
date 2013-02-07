@@ -7,6 +7,7 @@
 //import spire.math._
 //import spire.syntax._
 //
+//import scala.reflect.ClassTag
 //import scala.annotation.tailrec
 //
 ///**
@@ -18,7 +19,7 @@
 // * The original example is in literate Haskell with good comments, so consult
 // * the link for more information.
 // */
-//object Xyz {
+//object KleeneDemo {
 //
 //  /**
 //   * Show is a type class we'll use to control how types should display.
@@ -76,7 +77,7 @@
 //    def kplus: A = StarRig[A].kplus(a)
 //  }
 //
-//  implicit def matrixHasStarRig[A](implicit dim: Dim, sr: StarRig[A], ct: Manifest[A]) =
+//  implicit def matrixHasStarRig[A](implicit dim: Dim, sr: StarRig[A], ct: ClassTag[A]) =
 //    new StarRig[Matrix[A]] {
 //      def zero: Matrix[A] = Matrix.zero
 //      def one: Matrix[A] = Matrix.one
@@ -130,7 +131,7 @@
 //  trait Matrix[A] { lhs =>
 //    def dim: Dim
 //    def apply(x: Int, y: Int): A
-//    def map[B: Manifest](f: A => B): Matrix[B]
+//    def map[B: ClassTag](f: A => B): Matrix[B]
 //    def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
 //    def *(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
 //  }
@@ -140,7 +141,7 @@
 //     * Builds a Matrix[A] given a function (Int, Int) => A and an implicit Dim
 //     * to provide the dimensions over which to run the function.
 //     */
-//    def apply[A](f: (Int, Int) => A)(implicit dim: Dim, ct: Manifest[A]): Matrix[A] = {
+//    def apply[A: ClassTag](f: (Int, Int) => A)(implicit dim: Dim): Matrix[A] = {
 //      val n = dim.n
 //      val arr = new Array[A](n * n)
 //      cfor(0)(_ < n, _ + 1) { y =>
@@ -154,13 +155,13 @@
 //    /**
 //     * Given an implicit Dim, builds the zero matrix (all zeros).
 //     */
-//    def zero[A](implicit dim: Dim, rig: Rig[A], m: Manifest[A]): Matrix[A] =
-//      apply((x, y) => rig.zero)
+//    def zero[A: Rig: ClassTag](implicit dim: Dim): Matrix[A] =
+//      apply((x, y) => Rig[A].zero)
 //
 //    /**
 //     * Given an implicit Dim, builds the identity matrix (diagonal ones).
 //     */
-//    def one[A](implicit dim: Dim, rig: Rig[A], m: Manifest[A]): Matrix[A] =
+//    def one[A: Rig: ClassTag](implicit dim: Dim): Matrix[A] =
 //      apply((x, y) => if (x == y) Rig[A].one else Rig[A].zero)
 //  }
 //
@@ -173,12 +174,12 @@
 //   * The matrix also has naive implementations of addition and multiplication.
 //   * These are not optimized--do not use this class in the wild!
 //   */
-//  case class ArrayMatrix[A](arr: Array[A])(implicit val dim: Dim, ct: Manifest[A]) extends Matrix[A] { lhs =>
+//  case class ArrayMatrix[A](arr: Array[A])(implicit val dim: Dim, ct: ClassTag[A]) extends Matrix[A] { lhs =>
 //    def apply(x: Int, y: Int): A = arr(y * dim.n + x)
 //
 //    def update(x: Int, y: Int, a: A): Unit = arr(y * dim.n + x) = a
 //
-//    def map[B: Manifest](f: A => B): Matrix[B] =
+//    def map[B: ClassTag](f: A => B): Matrix[B] =
 //      ArrayMatrix(arr.map(f))
 //
 //    def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A] =
@@ -208,7 +209,7 @@
 //  }
 //
 //  // type class instance for Kleene[Matrix[A]]
-//  implicit def matrixHasKleene[A](implicit dim: Dim, ka: Kleene[A], ct: Manifest[A]) =
+//  implicit def matrixHasKleene[A](implicit dim: Dim, ka: Kleene[A], ct: ClassTag[A]) =
 //    new Kleene[Matrix[A]] {
 //      def zero: Matrix[A] = Matrix.zero
 //      def one: Matrix[A] = Matrix.one
