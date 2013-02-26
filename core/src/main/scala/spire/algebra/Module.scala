@@ -50,7 +50,7 @@ object RightModule {
 }
 
 final class LeftModuleOps[V, @spec(Int,Long,Float,Double) F](rhs: V)(implicit ev: LeftModule[V, F]) {
-  def *: (lhs:F): V = macro Ops.rbinop[F, V]
+  def *: (lhs:F): V = ev.timesl(lhs, rhs)
 }
 
 final class RightModuleOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: RightModule[V, F]) {

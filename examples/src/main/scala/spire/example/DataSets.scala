@@ -27,15 +27,15 @@ final class DataSet[V, @spec(Double) F, @spec(Double) K](
       case Ignored(_) => "ignored"
       case Continuous(_, _) => "continuous"
       case Categorical(_) => "categorical"
-      case Missing(v0, _) => s"${varType(v0)} with missing values"
+      case Missing(v0, _) => "%s with missing values" format v
     }
 
     val vars = variables.zipWithIndex map { case (v, i) =>
-      s"    %2d. ${v.label} (${varType(v)})" format (i + 1)
+      "    %2d. %s (%s)" format (i + 1, v.label, varType(v))
     } mkString "\n"
 
-    s"""$name - ${data.size} points with ${variables.size} variables (${space.dimensions} effective):
-       |$vars""".stripMargin
+    """%s - %s points with %s variables (%s effective):
+       |%s""".stripMargin format (name, data.size, variables.size, space.dimensions, vars)
   }
 }
 

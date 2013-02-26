@@ -1,11 +1,8 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 import scala.annotation.tailrec
 
 trait CoordinateSpace[V, @spec(Float, Double) F] extends InnerProductSpace[V, F] {
@@ -43,7 +40,7 @@ object CoordinateSpace {
   }
 
   def array[@spec(Float, Double) A](dimensions0: Int)(implicit field0: Field[A],
-      classTag0: ClassTag[A]) = new ArrayCoordinateSpace[A] {
+      classTag0: Manifest[A]) = new ArrayCoordinateSpace[A] {
     val scalar = field0
     val dimensions = dimensions0
     val classTag = classTag0
@@ -51,18 +48,11 @@ object CoordinateSpace {
 }
 
 final class CoordinateSpaceOps[V](v: V) {
-  def _x[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
+  def _x[F](implicit ev: CoordinateSpace[V, F]): F = ev._x(v)
+  def _y[F](implicit ev: CoordinateSpace[V, F]): F = ev._y(v)
+  def _z[F](implicit ev: CoordinateSpace[V, F]): F = ev._z(v)
 
-  def _y[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
+  def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F = ev.coord(v, rhs)
 
-  def _z[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.binopWithEv[Int, CoordinateSpace[V, F], F]
-
-  def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
+  def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int = ev.dimensions
 }

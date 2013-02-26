@@ -107,8 +107,8 @@ final class LiteralDoubleOps(val lhs:Double) {
 
 class LiteralBigIntOps(val lhs:BigInt) {
   def /~(rhs: BigInt) = lhs / rhs
-  def pow(rhs: BigInt) = spire.math.pow(lhs, rhs)
-  def **(rhs: BigInt) = spire.math.pow(lhs, rhs)
+  def pow(rhs: BigInt) = spire.math.fun.pow(lhs, rhs)
+  def **(rhs: BigInt) = spire.math.fun.pow(lhs, rhs)
 
   def +(rhs: SafeLong) = SafeLong(lhs) + rhs
   def *(rhs: SafeLong) = SafeLong(lhs) * rhs

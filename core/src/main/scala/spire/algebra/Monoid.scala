@@ -36,7 +36,7 @@ trait Monoid0 {
 
 trait Monoid1 extends Monoid0 with MonoidProductImplicits {
   implicit object StringMonoid extends StringMonoid
-  implicit def array[@spec A: ClassTag] = new ArrayMonoid[A]
+  implicit def array[@spec A: Manifest] = new ArrayMonoid[A]
 }
 
 trait OptionMonoid[A] extends Monoid[Option[A]] {

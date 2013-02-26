@@ -1,7 +1,6 @@
 package spire.benchmark
 
 import scala.{specialized => spec}
-import scala.reflect.ClassTag
 
 import spire.algebra._
 import spire.implicits._
@@ -22,7 +21,7 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
   var ds: Array[Double] = null
 
   override protected def setUp() {
-    val size = spire.math.pow(2, pow).toInt
+    val size = spire.math.fun.pow(2, pow).toInt
     fs = mkarray(size, "random")(nextGaussian.toFloat)
     ds = mkarray(size, "random")(nextGaussian)
   }
@@ -41,7 +40,7 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
   def nearlyMaxF(a: Array[Float], k: Int, start: Int = 0, end: Int = -1): Float = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
-    val ai = new Array[Float](max(k, 0) + 1)
+    val ai = new Array[Float](fun.max(k, 0) + 1)
     var i = i0 + 1
     var j = 0
     ai(0) = a(i0)
@@ -63,7 +62,7 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
   def nearlyMaxD(a: Array[Double], k: Int, start: Int = 0, end: Int = -1): Double = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
-    val ai = new Array[Double](max(k, 0) + 1)
+    val ai = new Array[Double](fun.max(k, 0) + 1)
     var i = i0 + 1
     var j = 0
     ai(0) = a(i0)
@@ -82,10 +81,10 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 
-  def nearlyMaxG[@spec A: Numeric: ClassTag](a: Array[A], k: Int, start: Int = 0, end: Int = -1): A = {
+  def nearlyMaxG[@spec A: Numeric: Manifest](a: Array[A], k: Int, start: Int = 0, end: Int = -1): A = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
-    val ai = new Array[A](max(k, 0) + 1)
+    val ai = new Array[A](fun.max(k, 0) + 1)
     var i = i0 + 1
     var j = 0
     ai(0) = a(i0)

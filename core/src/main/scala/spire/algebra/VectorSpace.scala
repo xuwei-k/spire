@@ -49,6 +49,6 @@ trait VectorSpace3 extends VectorSpace2 {
     vectorSpace: InnerProductSpace[V, F]): VectorSpace[V, F] = vectorSpace
 }
 
-final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](rhs: V)(implicit ev: VectorSpace[V, F]) {
-  def :/ (rhs:F): V = macro Ops.binop[F, V]
+final class VectorSpaceOps[V, @spec(Int,Long,Float,Double) F](lhs: V)(implicit ev: VectorSpace[V, F]) {
+  def :/ (rhs:F): V = ev.divr(lhs, rhs)
 }
