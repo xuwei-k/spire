@@ -85,7 +85,7 @@ object MyBuild extends Build {
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
-    scalacOptions in (Compile, compile) := {
+    scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 10)) =>
           scalacOptions.value
@@ -93,6 +93,8 @@ object MyBuild extends Build {
           scalacOptions.value ++ Seq("-Ywarn-unused-import")
       }
     },
+    scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
+    scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console)),
 
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
