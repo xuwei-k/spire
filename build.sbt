@@ -3,7 +3,6 @@ import sbtunidoc.{Plugin => UnidocPlugin}
 import sbtunidoc.Plugin.UnidocKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
-import ScoverageSbtPlugin._
 
 // Projects
 
@@ -74,7 +73,7 @@ lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
   .settings(libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % "1.2.4",
+    "com.chuusai" %% "shapeless" % "2.3.2",
     "org.apfloat" % "apfloat" % "1.8.2",
     "org.jscience" % "jscience" % "4.3.1"
   ))
@@ -86,8 +85,8 @@ lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
-    "org.typelevel" %%% "discipline" % "0.4",
-    "org.scalacheck" %%% "scalacheck" % "1.12.4"
+    "org.typelevel" %%% "discipline" % "0.7.2",
+    "org.scalacheck" %%% "scalacheck" % "1.13.4"
   ))
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
@@ -206,7 +205,7 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
   organization := "org.spire-math",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.0",
   crossScalaVersions := Seq("2.10.6", "2.11.8")
 )
 
@@ -222,7 +221,7 @@ lazy val commonSettings = Seq(
     "bintray/non" at "http://dl.bintray.com/non/maven",
     Resolver.sonatypeRepo("snapshots")
   ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1"
+  libraryDependencies += "org.typelevel" %%% "machinist" % "0.6.1"
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -231,8 +230,6 @@ lazy val commonJsSettings = Seq(
 )
 
 lazy val commonJvmSettings = Seq(
-  // -optimize has no effect in scala-js other than slowing down the build
-  scalacOptions += "-optimize",
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
@@ -258,13 +255,6 @@ lazy val publishSettings = Seq(
     </developers>
   )
 ) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
-
-lazy val scoverageSettings = Seq(
-  ScoverageKeys.coverageMinimum := 40,
-  ScoverageKeys.coverageFailOnMinimum := false,
-  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
-  ScoverageKeys.coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
-)
 
 // Project's settings
 
@@ -316,14 +306,14 @@ lazy val extrasSettings = Seq(
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
 
-lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.4" % "test")
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test")
 
 lazy val scalaTestSettings = Seq(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0-M7" % "test",
-  libraryDependencies += "com.chuusai" %% "shapeless" % "2.2.5" % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
+  libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2" % "test"
 )
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings
 
 lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
@@ -385,7 +375,6 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
-  "-Yinline-warnings",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
